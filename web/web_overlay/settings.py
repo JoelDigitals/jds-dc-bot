@@ -3,8 +3,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET', 'django-insecure-discord-bot-key-change-me')
-DEBUG = True
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-discord-bot-key-change-me')
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -19,6 +19,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -51,11 +52,11 @@ WSGI_APPLICATION = 'web_overlay.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.toeqgxdeoaaxjzkzzymy',
-        'PASSWORD': 'JDS_BoT2026!',
-        'HOST': 'aws-0-eu-west-1.pooler.supabase.com',
-        'PORT': '6543',
+        'NAME': os.environ.get('PGDATABASE', 'postgres'),
+        'USER': os.environ.get('PGUSER', 'postgres.toeqgxdeoaaxjzkzzymy'),
+        'PASSWORD': os.environ.get('PGPASSWORD', 'JDS_BoT2026!'),
+        'HOST': os.environ.get('PGHOST', 'aws-0-eu-west-1.pooler.supabase.com'),
+        'PORT': os.environ.get('PGPORT', '6543'),
         'OPTIONS': {
             'sslmode': 'require',
         },
@@ -69,10 +70,17 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'

@@ -1,0 +1,53 @@
+services:
+  # Django Web Dashboard
+  - type: web
+    name: jd-dashboard
+    rootDir: web
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn web_overlay.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_CLIENT_SECRET
+        sync: false
+      - key: DISCORD_REDIRECT_URI
+        sync: false
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DASHBOARD_URL
+        sync: false
+      - key: BOT_API_URL
+        sync: false
+      - key: PGDATABASE
+        value: postgres
+      - key: PGUSER
+        sync: false
+      - key: PGPASSWORD
+        sync: false
+      - key: PGHOST
+        sync: false
+      - key: PGPORT
+        value: "6543"
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+
+  # Discord Bot (Node.js)
+  - type: worker
+    name: jd-bot
+    runtime: node
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: CLIENT_ID
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: BOT_API_URL
+        value: http://localhost:3001
