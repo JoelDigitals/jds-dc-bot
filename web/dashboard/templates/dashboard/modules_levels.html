@@ -1,0 +1,14 @@
+{% load dashboard_extras %}
+<div id="page-levels" class="page">
+  <div class="page-header">
+    <h1><span class="mi">emoji_events</span> Level System</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="levels_enabled" onchange="updateSetting('levels_enabled', this.checked ? '1' : '0')"{% if settings|get:'levels_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Level-Up Channel</label>{% channel_select 'levels_channel_id' 'Channel auswählen (leer = aktueller Channel)' 'text' %}</div>
+      <div class="form-group"><label>Level-Up Nachricht</label><textarea id="levels_message" rows="3" onchange="updateSetting('levels_message', this.value)">{{ settings|get:'levels_message'|default:'Glückwunsch {user}, du hast Level {level} erreicht!' }}</textarea><small>{user}, {level}, {server}</small></div>
+      <p style="color:rgba(255,255,255,0.6);font-size:13px"><span class="mi" style="font-size:13px">info</span> 15 XP pro Nachricht, 60s Cooldown. <code>/rank</code> <code>/leaderboard</code></p>
+    </div>
+  </div>
+</div>

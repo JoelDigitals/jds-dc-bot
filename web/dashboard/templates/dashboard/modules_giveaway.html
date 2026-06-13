@@ -1,0 +1,10 @@
+{% load dashboard_extras %}
+<div id="page-giveaway" class="page">
+  <div class="page-header"><h1><span class="mi">card_giftcard</span> Giveaways</h1><div class="module-toggle"><label class="toggle"><input type="checkbox" id="giveaway_enabled" onchange="updateSetting('giveaway_enabled', this.checked ? '1' : '0')"{% if settings|get:'giveaway_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div></div>
+  <div class="card"><div class="card-header"><h2>Verwaltung</h2></div>
+    <div class="card-body">
+      <p>Nutze <code>/giveaway Preis:"Gewinn" dauer:2h gewinner:1</code> im Discord.</p>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">info</span> Der Bot prüft alle 30 Sekunden auf abgelaufene Giveaways</p>
+    </div>
+  </div>
+</div>

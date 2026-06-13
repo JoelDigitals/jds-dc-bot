@@ -1,0 +1,12 @@
+{% load dashboard_extras %}
+<div id="page-suggestions" class="page">
+  <div class="page-header">
+    <h1><span class="mi">lightbulb</span> Suggestions</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="suggestions_enabled" onchange="updateSetting('suggestions_enabled', this.checked ? '1' : '0')"{% if settings|get:'suggestions_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Suggestions-Channel</label>{% channel_select 'suggestions_channel_id' 'Channel auswählen' 'text' %}<small>Hier werden Vorschläge gepostet (via <code>/suggest</code>)</small></div>
+    </div>
+  </div>
+</div>

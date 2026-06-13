@@ -1,0 +1,42 @@
+{% load dashboard_extras %}
+<div id="page-video" class="page">
+  <div class="page-header">
+    <h1><span class="mi">notifications</span> Video & Social Benachrichtigungen</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="video_enabled" onchange="updateSetting('video_enabled', this.checked ? '1' : '0')"{% if settings|get:'video_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="color:#ff0000">play_circle</span> YouTube</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Channel</label>{% channel_select 'video_channel_id' 'Channel auswählen' 'text' %}</div>
+      <div class="form-group"><label>YouTube Channel URL</label><input type="url" id="video_youtube_channel" placeholder="https://youtube.com/@Kanal oder /channel/UC..." onchange="updateSetting('video_youtube_channel', this.value)" value="{{ settings|get:'video_youtube_channel'|default:'' }}"><small>Benachrichtigt bei neuen Videos</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="color:#000000">music_note</span> TikTok</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>TikTok Channel</label>{% channel_select 'video_tiktok_channel_id' 'Channel auswählen' 'text' %}</div>
+      <div class="form-group"><label>TikTok Benutzername</label><input type="text" id="video_tiktok_user" placeholder="@benutzername" onchange="updateSetting('video_tiktok_user', this.value)" value="{{ settings|get:'video_tiktok_user'|default:'' }}"><small>Benachrichtigt bei neuen TikTok-Videos</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="color:#9146ff">live_tv</span> Twitch</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Twitch Channel</label>{% channel_select 'video_twitch_channel_id' 'Channel auswählen' 'text' %}</div>
+      <div class="form-group"><label>Twitch Kanalname</label><input type="text" id="video_twitch_user" placeholder="kanalname" onchange="updateSetting('video_twitch_user', this.value)" value="{{ settings|get:'video_twitch_user'|default:'' }}"><small>Benachrichtigt bei Live-Streams</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">alternate_email</span> Twitter / X</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Twitter Channel</label>{% channel_select 'video_twitter_channel_id' 'Channel auswählen' 'text' %}</div>
+      <div class="form-group"><label>Twitter Benutzername</label><input type="text" id="video_twitter_user" placeholder="@benutzername" onchange="updateSetting('video_twitter_user', this.value)" value="{{ settings|get:'video_twitter_user'|default:'' }}"><small>Benachrichtigt bei neuen Tweets</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="color:#e4405f">photo_camera</span> Instagram</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Instagram Channel</label>{% channel_select 'video_instagram_channel_id' 'Channel auswählen' 'text' %}</div>
+      <div class="form-group"><label>Instagram Benutzername</label><input type="text" id="video_instagram_user" placeholder="@benutzername" onchange="updateSetting('video_instagram_user', this.value)" value="{{ settings|get:'video_instagram_user'|default:'' }}"><small>Benachrichtigt bei neuen Posts</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">campaign</span> Ping-Rolle</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Rolle pingen bei neuen Posts</label>{% role_select 'video_ping_role_id' 'Keine Ping-Rolle' %}<small>Wähle eine Rolle, die bei neuen Videos/Posts benachrichtigt wird</small></div>
+    </div>
+  </div>
+</div>

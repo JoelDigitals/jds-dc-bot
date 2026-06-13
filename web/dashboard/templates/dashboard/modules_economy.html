@@ -1,0 +1,11 @@
+{% load dashboard_extras %}
+<div id="page-economy" class="page">
+  <div class="page-header"><h1><span class="mi">account_balance</span> Economy</h1><div class="module-toggle"><label class="toggle"><input type="checkbox" id="economy_enabled" onchange="updateSetting('economy_enabled', this.checked ? '1' : '0')"{% if settings|get:'economy_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div></div>
+  <div class="card"><div class="card-header"><h2>System</h2></div>
+    <div class="card-body">
+      <p>Commands: <code>/economy balance</code> <code>/economy daily</code> <code>/economy work</code> <code>/economy slots</code> <code>/economy transfer</code> <code>/economy shop</code> <code>/economy leaderboard</code></p>
+      <p style="color:rgba(255,255,255,0.6);margin-top:12px">Admin: <code>/economy-admin shop-add</code> <code>/economy-admin shop-remove</code></p>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">payments</span> Daily: 100 <span class="mi" style="font-size:14px">payments</span> | Work: 20-80 <span class="mi" style="font-size:14px">payments</span> (1h CD) | Slots | Transfer</p>
+    </div>
+  </div>
+</div>

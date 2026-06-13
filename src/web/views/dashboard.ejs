@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Bot Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">🤖</span>
+        <h2>Bot Panel</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/" class="nav-item active"><span class="nav-icon">📊</span> Dashboard</a>
+        <div class="nav-section">Kommunikation</div>
+        <a href="#" class="nav-item" onclick="showModule('welcome')"><span class="nav-icon">👋</span> Begrüßung</a>
+        <a href="#" class="nav-item" onclick="showModule('goodbye')"><span class="nav-icon">👋</span> Verabschiedung</a>
+        <a href="#" class="nav-item" onclick="showModule('ticket')"><span class="nav-icon">🎫</span> Tickets</a>
+        <a href="#" class="nav-item" onclick="showModule('news')"><span class="nav-icon">📰</span> News / Blog</a>
+        <a href="#" class="nav-item" onclick="showModule('video')"><span class="nav-icon">🎬</span> Video</a>
+        <a href="#" class="nav-item" onclick="showModule('suggestions')"><span class="nav-icon">💡</span> Suggestions</a>
+        <div class="nav-section">Community</div>
+        <a href="#" class="nav-item" onclick="showModule('levels')"><span class="nav-icon">🏆</span> Level System</a>
+        <a href="#" class="nav-item" onclick="showModule('reactionroles')"><span class="nav-icon">📋</span> Reaction Roles</a>
+        <a href="#" class="nav-item" onclick="showModule('giveaway')"><span class="nav-icon">🎉</span> Giveaways</a>
+        <a href="#" class="nav-item" onclick="showModule('autorole')"><span class="nav-icon">🤝</span> Autorole</a>
+        <a href="#" class="nav-item" onclick="showModule('economy')"><span class="nav-icon">💰</span> Economy</a>
+        <a href="#" class="nav-item" onclick="showModule('poll')"><span class="nav-icon">📊</span> Umfragen</a>
+        <a href="#" class="nav-item" onclick="showModule('birthday')"><span class="nav-icon">🎂</span> Geburtstage</a>
+        <div class="nav-section">Sicherheit</div>
+        <a href="#" class="nav-item" onclick="showModule('moderation')"><span class="nav-icon">🛡️</span> Moderation</a>
+        <a href="#" class="nav-item" onclick="showModule('automod')"><span class="nav-icon">🤖</span> AutoMod</a>
+        <a href="#" class="nav-item" onclick="showModule('logging')"><span class="nav-icon">📝</span> Logging</a>
+        <div class="nav-section">Extras</div>
+        <a href="#" class="nav-item" onclick="showModule('tempvoice')"><span class="nav-icon">🔊</span> Temp Voice</a>
+        <a href="#" class="nav-item" onclick="showModule('serverstats')"><span class="nav-icon">📊</span> Server Stats</a>
+        <a href="#" class="nav-item" onclick="showModule('customcommands')"><span class="nav-icon">⌨️</span> Custom Commands</a>
+        <a href="#" class="nav-item" onclick="showModule('tags')"><span class="nav-icon">📚</span> Tags / FAQ</a>
+        <a href="#" class="nav-item" onclick="showModule('counting')"><span class="nav-icon">🔢</span> Counting Game</a>
+        <a href="#" class="nav-item" onclick="showModule('verification')"><span class="nav-icon">✅</span> Verification</a>
+        <div class="nav-section">System</div>
+        <a href="/logout" class="nav-item"><span class="nav-icon">🚪</span> Logout</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <!-- Dashboard Home -->
+      <div id="page-dashboard" class="page active">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p>Server: <strong id="serverCount">-</strong> | <span class="status-badge online">🟢 Online</span></p>
+        </div>
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card"><div class="stat-icon">👋</div><div class="stat-info"><h3>Begrüßung</h3><p>Aktiv auf <strong id="welcomeCount">-</strong> Servern</p></div></div>
+          <div class="stat-card"><div class="stat-icon">🎫</div><div class="stat-info"><h3>Tickets</h3><p><strong id="ticketCount">-</strong> offene Tickets</p></div></div>
+          <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-info"><h3>Level</h3><p><strong id="levelCount">-</strong> Spieler</p></div></div>
+          <div class="stat-card"><div class="stat-icon">🛡️</div><div class="stat-info"><h3>Verwarnungen</h3><p><strong id="warnCount">-</strong> insgesamt</p></div></div>
+        </div>
+      </div>
+
+      <!-- Welcome Module -->
+      <div id="page-welcome" class="page">
+        <div class="page-header">
+          <h1>👋 Begrüßung</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="welcome_enabled" onchange="updateSetting('welcome_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Channel-Begrüßung</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Channel ID</label><input type="text" id="welcome_channel_id" placeholder="Channel ID" onchange="updateSetting('welcome_channel_id', this.value)"></div>
+            <div class="form-group"><label>Nachricht</label><textarea id="welcome_message" rows="3" onchange="updateSetting('welcome_message', this.value)">Willkommen {user} auf {server}!</textarea><small>{user}, {server}, {membercount}</small></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Private Begrüßung (DM)</h2></div>
+          <div class="card-body">
+            <div class="module-toggle" style="margin-bottom:16px"><label class="toggle"><input type="checkbox" id="welcome_dm_enabled" onchange="updateSetting('welcome_dm_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>DM aktivieren</span></div>
+            <div class="form-group"><label>DM-Nachricht</label><textarea id="welcome_dm_message" rows="3" onchange="updateSetting('welcome_dm_message', this.value)">Hallo {user}, willkommen auf {server}!</textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Goodbye Module -->
+      <div id="page-goodbye" class="page">
+        <div class="page-header">
+          <h1>👋 Verabschiedung</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="goodbye_enabled" onchange="updateSetting('goodbye_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Channel</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Channel ID</label><input type="text" id="goodbye_channel_id" placeholder="Channel ID" onchange="updateSetting('goodbye_channel_id', this.value)"></div>
+            <div class="form-group"><label>Nachricht</label><textarea id="goodbye_message" rows="3" onchange="updateSetting('goodbye_message', this.value)">{user} hat den Server verlassen.</textarea><small>{user}, {server}, {membercount}</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket Module -->
+      <div id="page-ticket" class="page">
+        <div class="page-header">
+          <h1>🎫 Tickets & Support</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="ticket_enabled" onchange="updateSetting('ticket_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Kategorie-ID</label><input type="text" id="ticket_category_id" placeholder="Kategorie ID" onchange="updateSetting('ticket_category_id', this.value)"></div>
+            <div class="form-group"><label>Staff-Rolle ID</label><input type="text" id="ticket_staff_role_id" placeholder="Rollen ID" onchange="updateSetting('ticket_staff_role_id', this.value)"></div>
+            <div class="form-group"><label>Begrüßungsnachricht</label><textarea id="ticket_welcome_message" rows="3" onchange="updateSetting('ticket_welcome_message', this.value)">Ein Teammitglied wird sich bald um dein Anliegen kümmern.</textarea></div>
+            <p style="margin-top:16px;color:rgba(255,255,255,0.7);">💡 <code>/ticket panel</code> im Channel ausführen</p>
+          </div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Offene Tickets</h2></div><div class="card-body" id="ticketList"><p style="color:rgba(255,255,255,0.5);">Lade...</p></div></div>
+      </div>
+
+      <!-- News Module -->
+      <div id="page-news" class="page">
+        <div class="page-header">
+          <h1>📰 News & Blog</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="news_enabled" onchange="updateSetting('news_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>RSS Feed</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Channel ID</label><input type="text" id="news_channel_id" placeholder="Channel ID" onchange="updateSetting('news_channel_id', this.value)"></div>
+            <div class="form-group"><label>RSS URL</label><input type="url" id="news_rss_url" placeholder="https://example.com/rss" onchange="updateSetting('news_rss_url', this.value)"><small>Prüft alle 15 Min auf neue Artikel</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Module -->
+      <div id="page-video" class="page">
+        <div class="page-header">
+          <h1>🎬 Video Benachrichtigungen</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="video_enabled" onchange="updateSetting('video_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>YouTube</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Discord Channel ID</label><input type="text" id="video_channel_id" placeholder="Channel ID" onchange="updateSetting('video_channel_id', this.value)"></div>
+            <div class="form-group"><label>YouTube Channel URL</label><input type="url" id="video_youtube_channel" placeholder="https://youtube.com/channel/UC..." onchange="updateSetting('video_youtube_channel', this.value)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggestions Module -->
+      <div id="page-suggestions" class="page">
+        <div class="page-header">
+          <h1>💡 Suggestions</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="suggestions_enabled" onchange="updateSetting('suggestions_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Suggestions-Channel ID</label><input type="text" id="suggestions_channel_id" placeholder="Channel ID" onchange="updateSetting('suggestions_channel_id', this.value)"><small>Hier werden Vorschläge gepostet (via <code>/suggest</code>)</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Levels Module -->
+      <div id="page-levels" class="page">
+        <div class="page-header">
+          <h1>🏆 Level System</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="levels_enabled" onchange="updateSetting('levels_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Level-Up Channel ID</label><input type="text" id="levels_channel_id" placeholder="Channel ID (leer = aktueller Channel)" onchange="updateSetting('levels_channel_id', this.value)"></div>
+            <div class="form-group"><label>Level-Up Nachricht</label><textarea id="levels_message" rows="3" onchange="updateSetting('levels_message', this.value)">Glückwunsch {user}, du hast Level {level} erreicht!</textarea><small>{user}, {level}, {server}</small></div>
+            <p style="color:rgba(255,255,255,0.6);font-size:13px">💡 15 XP pro Nachricht, 60s Cooldown. <code>/rank</code> <code>/leaderboard</code></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reaction Roles Module -->
+      <div id="page-reactionroles" class="page">
+        <div class="page-header">
+          <h1>📋 Reaction Roles</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="reactionroles_enabled" onchange="updateSetting('reactionroles_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Verwaltung</h2></div>
+          <div class="card-body">
+            <p>Verwende diese Discord-Befehle:</p>
+            <ul style="margin:12px 0;padding-left:20px;color:rgba(255,255,255,0.7)">
+              <li><code>/reactionrole add @Rolle :emoji: Label</code> — Rolle hinzufügen</li>
+              <li><code>/reactionrole panel</code> — Panel senden</li>
+            </ul>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px">💡 Rollen werden im Dashboard demnächst grafisch verwaltet</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Giveaway Module -->
+      <div id="page-giveaway" class="page">
+        <div class="page-header">
+          <h1>🎉 Giveaways</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="giveaway_enabled" onchange="updateSetting('giveaway_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Verwaltung</h2></div>
+          <div class="card-body">
+            <p>Nutze <code>/giveaway Preis:"Gewinn" dauer:2h gewinner:1</code> im Discord.</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px">💡 Der Bot prüft alle 30 Sekunden auf abgelaufene Giveaways</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Autorole Module -->
+      <div id="page-autorole" class="page">
+        <div class="page-header">
+          <h1>🤝 Autorole</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="autorole_enabled" onchange="updateSetting('autorole_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Rollen ID (Join-Rolle)</label><input type="text" id="autorole_role_id" placeholder="Rollen ID" onchange="updateSetting('autorole_role_id', this.value)"><small>Wird automatisch beim Beitritt vergeben</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Moderation Module -->
+      <div id="page-moderation" class="page">
+        <div class="page-header">
+          <h1>🛡️ Moderation</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="moderation_enabled" onchange="updateSetting('moderation_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Log-Channel</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Channel ID</label><input type="text" id="moderation_log_channel_id" placeholder="Channel ID" onchange="updateSetting('moderation_log_channel_id', this.value)"><small>Warn/Kick/Ban werden hier protokolliert</small></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Verwarnungen</h2></div><div class="card-body" id="warnsList"><p style="color:rgba(255,255,255,0.5);">Lade...</p></div></div>
+      </div>
+
+      <!-- AutoMod Module -->
+      <div id="page-automod" class="page">
+        <div class="page-header">
+          <h1>🤖 AutoMod</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="automod_enabled" onchange="updateSetting('automod_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Filter</h2></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Bad Words (komma-getrennt)</label>
+              <textarea id="automod_badwords" rows="3" placeholder="wort1, wort2, wort3" onchange="updateSetting('automod_badwords', this.value)"></textarea>
+            </div>
+            <div style="display:flex;gap:32px;flex-wrap:wrap">
+              <div class="module-toggle"><label class="toggle"><input type="checkbox" id="automod_block_links" onchange="updateSetting('automod_block_links', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Links blockieren</span></div>
+              <div class="module-toggle"><label class="toggle"><input type="checkbox" id="automod_block_invites" onchange="updateSetting('automod_block_invites', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Discord-Einladungen blockieren</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logging Module -->
+      <div id="page-logging" class="page">
+        <div class="page-header">
+          <h1>📝 Logging</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="logging_enabled" onchange="updateSetting('logging_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Log-Channel</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Channel ID</label><input type="text" id="logging_channel_id" placeholder="Channel ID" onchange="updateSetting('logging_channel_id', this.value)"><small>Loggt: Nachrichten löschen/bearbeiten, Beitritt/Austritt, Voice</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Temp Voice Module -->
+      <div id="page-tempvoice" class="page">
+        <div class="page-header">
+          <h1>🔊 Temp Voice</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="tempvoice_enabled" onchange="updateSetting('tempvoice_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Voice-Channel ID (Eintritts-Channel)</label><input type="text" id="tempvoice_channel_id" placeholder="Channel ID" onchange="updateSetting('tempvoice_channel_id', this.value)"><small>Nutzer betreten diesen Channel → temporärer Channel wird erstellt</small></div>
+            <div class="form-group"><label>Kategorie-ID (für temporäre Channels)</label><input type="text" id="tempvoice_category_id" placeholder="Kategorie ID" onchange="updateSetting('tempvoice_category_id', this.value)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Server Stats Module -->
+      <div id="page-serverstats" class="page">
+        <div class="page-header">
+          <h1>📊 Server Stats</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="serverstats_enabled" onchange="updateSetting('serverstats_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Kategorie-ID</label><input type="text" id="serverstats_category_id" placeholder="Kategorie ID" onchange="updateSetting('serverstats_category_id', this.value)"><small>Voice-Channels werden automatisch erstellt: 👥 Mitglieder, 👤 Nutzer, 🤖 Bots</small></div>
+            <p style="color:rgba(255,255,255,0.6)">💡 Alternativ <code>/serverstats #kategorie</code> im Discord nutzen</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Commands Module -->
+      <div id="page-customcommands" class="page">
+        <div class="page-header">
+          <h1>⌨️ Custom Commands</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="customcommands_enabled" onchange="updateSetting('customcommands_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Verwaltung</h2></div>
+          <div class="card-body">
+            <p>Nutze diese Discord-Befehle:</p>
+            <ul style="margin:12px 0;padding-left:20px;color:rgba(255,255,255,0.7)">
+              <li><code>/cc add name:"regeln" antwort:"Hier sind die Regeln..."</code></li>
+              <li><code>/cc remove name:"regeln"</code></li>
+              <li><code>/cc list</code></li>
+            </ul>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px">💡 Nutzer rufen mit <code>!regeln</code> auf</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Economy Module -->
+      <div id="page-economy" class="page">
+        <div class="page-header">
+          <h1>💰 Economy</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="economy_enabled" onchange="updateSetting('economy_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>System</h2></div>
+          <div class="card-body">
+            <p>Commands: <code>/economy balance</code> <code>/economy daily</code> <code>/economy work</code> <code>/economy slots</code> <code>/economy transfer</code> <code>/economy shop</code> <code>/economy leaderboard</code></p>
+            <p style="color:rgba(255,255,255,0.6);margin-top:12px">Admin: <code>/economy-admin shop-add</code> <code>/economy-admin shop-remove</code></p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px">💰 Daily: 100 🪙 | 💼 Work: 20-80 🪙 (1h CD) | 🎰 Slots | 📤 Transfer</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Poll Module -->
+      <div id="page-poll" class="page">
+        <div class="page-header">
+          <h1>📊 Umfragen</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="poll_enabled" onchange="updateSetting('poll_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Erstellung</h2></div>
+          <div class="card-body">
+            <p>Nutze <code>/poll frage:"..." option1:"..." option2:"..."</code> (2-10 Optionen)</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px">💡 Umfragen werden mit Emoji-Reactions erstellt</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Birthday Module -->
+      <div id="page-birthday" class="page">
+        <div class="page-header">
+          <h1>🎂 Geburtstage</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="birthday_enabled" onchange="updateSetting('birthday_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+          <div class="card-body">
+            <div class="form-group"><label>Announce-Channel ID</label><input type="text" id="birthday_channel_id" placeholder="Channel ID" onchange="updateSetting('birthday_channel_id', this.value)"></div>
+            <div class="form-group"><label>Geburtstags-Rolle ID</label><input type="text" id="birthday_role_id" placeholder="Rollen ID" onchange="updateSetting('birthday_role_id', this.value)"><small>Wird am Geburtstag automatisch zugewiesen</small></div>
+            <p style="color:rgba(255,255,255,0.6)">👤 Nutzer: <code>/birthday set tag:15 monat:6 jahr:2000</code></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags Module -->
+      <div id="page-tags" class="page">
+        <div class="page-header">
+          <h1>📚 Tags / FAQ</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="tags_enabled" onchange="updateSetting('tags_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Verwaltung</h2></div>
+          <div class="card-body">
+            <p>Befehle: <code>/tag add name:"regeln" inhalt:"Text..."</code> <code>/tag remove</code> <code>/tag list</code></p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px">💡 Nutzer rufen mit <code>?regeln</code> auf</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Counting Module -->
+      <div id="page-counting" class="page">
+        <div class="page-header">
+          <h1>🔢 Counting Game</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="counting_enabled" onchange="updateSetting('counting_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einrichtung</h2></div>
+          <div class="card-body">
+            <p>Nutze <code>/counting #channel</code> um einen Zähl-Channel festzulegen.</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px">🔢 Nutzer zählen hoch ⬆️, Fehler setzt zurück. Meilensteine bei 10/50/100 🎉</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Module -->
+      <div id="page-verification" class="page">
+        <div class="page-header">
+          <h1>✅ Verification</h1>
+          <div class="module-toggle"><label class="toggle"><input type="checkbox" id="verification_enabled" onchange="updateSetting('verification_enabled', this.checked ? '1' : '0')"><span class="slider"></span></label><span>Modul aktivieren</span></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Einrichtung</h2></div>
+          <div class="card-body">
+            <p>1. <code>/verify setup @Rolle</code> — Rolle festlegen</p>
+            <p>2. <code>/verify panel</code> — Button-Panel senden</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px">✅ Nutzer klicken auf Button → erhalten die Rolle</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

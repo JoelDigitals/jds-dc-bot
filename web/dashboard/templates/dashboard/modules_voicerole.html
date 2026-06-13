@@ -1,0 +1,14 @@
+{% load dashboard_extras %}
+<div id="page-voicerole" class="page">
+  <div class="page-header">
+    <h1><span class="mi">headphones</span> Voice Roles</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="voicerole_enabled" onchange="updateSetting('voicerole_enabled', this.checked ? '1' : '0')"{% if settings|get:'voicerole_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Voice-Channel (optional)</label>{% channel_select 'voicerole_channel_id' 'Channel auswählen (leer = alle)' 'voice' %}<small>Wenn leer, gilt die Rolle für alle Voice-Channels</small></div>
+      <div class="form-group"><label>Rolle (bei Beitritt)</label>{% role_select 'voicerole_role_id' 'Rolle auswählen' %}<small>Wird automatisch zugewiesen beim Betreten eines Voice-Channels</small></div>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">info</span> Die Rolle wird entfernt, wenn der Nutzer den Voice-Channel verlässt</p>
+    </div>
+  </div>
+</div>

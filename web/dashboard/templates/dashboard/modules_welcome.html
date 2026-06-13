@@ -1,0 +1,31 @@
+{% load dashboard_extras %}
+<div id="page-welcome" class="page">
+  <div class="page-header">
+    <h1><span class="mi">diversity_3</span> Begrüßung</h1>
+    <div class="module-toggle">
+      <label class="toggle"><input type="checkbox" id="welcome_enabled" onchange="updateSetting('welcome_enabled', this.checked ? '1' : '0')"{% if settings|get:'welcome_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label>
+      <span>Modul aktivieren</span>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">message</span> Channel-Begrüßung</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Channel</label>{% channel_select 'welcome_channel_id' 'Channel auswählen' 'text' %}</div>
+      <div class="form-group"><label>Nachricht (Text)</label><textarea id="welcome_message" rows="3" onchange="updateSetting('welcome_message', this.value)">{{ settings|get:'welcome_message'|default:'Willkommen {user} auf {server}!' }}</textarea><small>Variablen: {user}, {server}, {membercount}</small></div>
+      <div class="form-group" style="margin-top:20px;padding-top:16px;border-top:1px solid #30363d">
+        <label>Embed-Titel</label><input type="text" id="welcome_embed_title" placeholder="Willkommen!" onchange="updateSetting('welcome_embed_title', this.value)" value="{{ settings|get:'welcome_embed_title'|default:'Willkommen {user}!' }}">
+      </div>
+      <div class="form-group"><label>Embed-Beschreibung</label><textarea id="welcome_embed_desc" rows="2" onchange="updateSetting('welcome_embed_desc', this.value)" placeholder="Schön, dass du da bist!">{{ settings|get:'welcome_embed_desc'|default:'Schön, dass du auf {server} bist!' }}</textarea></div>
+      <div class="form-group"><label>Embed-Bild-URL</label><input type="url" id="welcome_embed_image" placeholder="https://i.imgur.com/..." onchange="updateSetting('welcome_embed_image', this.value)" value="{{ settings|get:'welcome_embed_image'|default:'' }}"><small>Großes Banner-Bild im Embed (optional)</small></div>
+      <div class="form-group"><label>Embed-Thumbnail-URL</label><input type="url" id="welcome_embed_thumbnail" placeholder="https://i.imgur.com/..." onchange="updateSetting('welcome_embed_thumbnail', this.value)" value="{{ settings|get:'welcome_embed_thumbnail'|default:'' }}"><small>Kleines Icon oben rechts (optional)</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">mail</span> Private Begrüßung (DM)</h2></div>
+    <div class="card-body">
+      <div class="module-toggle" style="margin-bottom:16px">
+        <label class="toggle"><input type="checkbox" id="welcome_dm_enabled" onchange="updateSetting('welcome_dm_enabled', this.checked ? '1' : '0')"{% if settings|get:'welcome_dm_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label>
+        <span>DM aktivieren</span>
+      </div>
+      <div class="form-group"><label>DM-Nachricht</label><textarea id="welcome_dm_message" rows="3" onchange="updateSetting('welcome_dm_message', this.value)">{{ settings|get:'welcome_dm_message'|default:'Hallo {user}, willkommen auf {server}!' }}</textarea></div>
+    </div>
+  </div>
+</div>

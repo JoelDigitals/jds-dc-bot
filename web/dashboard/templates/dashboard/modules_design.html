@@ -1,0 +1,60 @@
+{% load dashboard_extras %}
+<div id="page-design" class="page">
+  <div class="page-header">
+    <h1><span class="mi">palette</span> Bot Design</h1>
+    <p style="color:#8b949e;font-size:14px">Passe das Erscheinungsbild deines Bots an</p>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">format_paint</span> Embed-Farbe</h2></div>
+    <div class="card-body">
+      <div class="form-group">
+        <label>Akzentfarbe (Hex)</label>
+        <div style="display:flex;gap:12px;align-items:center">
+          <input type="color" id="embed_color" onchange="updateSetting('embed_color', this.value)" value="{{ settings|get:'embed_color'|default:'#5865F2' }}" style="width:48px;height:48px;padding:2px;background:#0d1117;border:1px solid #30363d;border-radius:8px;cursor:pointer;">
+          <input type="text" oninput="document.getElementById('embed_color_preview').value=this.value;updateSetting('embed_color', this.value)" value="{{ settings|get:'embed_color'|default:'#5865F2' }}" style="flex:1;padding:10px 14px;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;font-size:14px;outline:none;">
+        </div>
+        <small>Wird in allen Bot-Embeds als Akzentfarbe verwendet</small>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">text_fields</span> Embed-Footer</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Footer-Text</label><input type="text" id="embed_footer" placeholder="z.B. Mein Server | BotName" onchange="updateSetting('embed_footer', this.value)" value="{{ settings|get:'embed_footer'|default:'' }}"><small>Erscheint in der Fußzeile aller Bot-Embeds</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">image</span> Ticket-Banner</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Banner-URL</label><input type="url" id="ticket_banner_url" placeholder="https://i.imgur.com/..." onchange="updateSetting('ticket_banner_url', this.value)" value="{{ settings|get:'ticket_banner_url'|default:'' }}"><small>Wird als Banner im Ticket-Panel-Embed angezeigt (empfohlen: 1024x256)</small></div>
+      {% if settings|get:'ticket_banner_url' %}
+      <div style="margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid #30363d;max-width:600px">
+        <img src="{{ settings|get:'ticket_banner_url' }}" alt="Preview" style="width:100%;display:block">
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">auto_awesome</span> Vorschau</h2></div>
+    <div class="card-body">
+      <div style="background:#1c2128;border:1px solid #30363d;border-radius:12px;padding:20px;max-width:520px;margin-bottom:16px">
+        <div style="display:flex;gap:16px">
+          <div style="width:4px;border-radius:4px;flex-shrink:0;background:{{ settings|get:'embed_color'|default:'#5865F2' }}"></div>
+          <div style="flex:1">
+            <h4 style="font-weight:600;margin-bottom:8px">Bot Embed Vorschau</h4>
+            <p style="color:#8b949e;font-size:14px;margin-bottom:12px;line-height:1.5">So wird eine Bot-Nachricht mit deinen Einstellungen aussehen.</p>
+            {% if settings|get:'embed_footer' %}
+            <div style="border-top:1px solid #30363d;padding-top:10px;font-size:12px;color:#8b949e;display:flex;align-items:center;gap:8px">
+              <span class="mi" style="font-size:14px">smart_toy</span>
+              <span>{{ settings|get:'embed_footer' }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label>Channel für Test-Embed</label>
+        <select id="testEmbedChannel" class="dc-select"><option value="">— Channel auswählen —</option></select>
+      </div>
+      <button onclick="var ch=document.getElementById('testEmbedChannel').value;if(ch)sendTestEmbed(ch);else showToast('Bitte Channel auswählen');" style="padding:12px 24px;background:#238636;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
+        <span class="mi" style="font-size:18px">send</span> Test-Embed senden
+      </button>
+    </div>
+  </div>
+</div>

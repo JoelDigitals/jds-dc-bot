@@ -1,0 +1,13 @@
+{% load dashboard_extras %}
+<div id="page-moderation" class="page">
+  <div class="page-header">
+    <h1><span class="mi">gavel</span> Moderation</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="moderation_enabled" onchange="updateSetting('moderation_enabled', this.checked ? '1' : '0')"{% if settings|get:'moderation_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Log-Channel</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Channel</label>{% channel_select 'moderation_log_channel_id' 'Channel auswählen' 'text' %}<small>Warn/Kick/Ban werden hier protokolliert</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Verwarnungen</h2></div><div class="card-body" id="warnsList"><p style="color:rgba(255,255,255,0.5);">Lade...</p></div></div>
+</div>

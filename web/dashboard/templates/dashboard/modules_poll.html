@@ -1,0 +1,10 @@
+{% load dashboard_extras %}
+<div id="page-poll" class="page">
+  <div class="page-header"><h1><span class="mi">how_to_vote</span> Umfragen</h1><div class="module-toggle"><label class="toggle"><input type="checkbox" id="poll_enabled" onchange="updateSetting('poll_enabled', this.checked ? '1' : '0')"{% if settings|get:'poll_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div></div>
+  <div class="card"><div class="card-header"><h2>Erstellung</h2></div>
+    <div class="card-body">
+      <p>Nutze <code>/poll frage:"..." option1:"..." option2:"..."</code> (2-10 Optionen)</p>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">info</span> Umfragen werden mit Reactions erstellt</p>
+    </div>
+  </div>
+</div>

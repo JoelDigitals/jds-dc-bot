@@ -1,0 +1,14 @@
+{% load dashboard_extras %}
+<div id="page-invitetracker" class="page">
+  <div class="page-header">
+    <h1><span class="mi">link</span> Invite Tracker</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="invitetracker_enabled" onchange="updateSetting('invitetracker_enabled', this.checked ? '1' : '0')"{% if settings|get:'invitetracker_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Log-Channel</label>{% channel_select 'invitetracker_channel_id' 'Channel auswählen' 'text' %}<small>Invites werden hier geloggt (Einladungen, Ränge)</small></div>
+      <p style="color:rgba(255,255,255,0.6)"><span class="mi" style="font-size:13px">info</span> Befehle: <code>/invites</code> — Eigene Einladungen <code>/invite leaderboard</code> — Bestenliste</p>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">info</span> Trackt: Einladungen, Verluste, Fakes, Bonus-Invites</p>
+    </div>
+  </div>
+</div>

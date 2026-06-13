@@ -1,0 +1,21 @@
+{% load dashboard_extras %}
+<div id="page-music" class="page">
+  <div class="page-header">
+    <h1><span class="mi">library_music</span> Music</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="music_enabled" onchange="updateSetting('music_enabled', this.checked ? '1' : '0')"{% if settings|get:'music_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Einrichtung</h2></div>
+    <div class="card-body">
+      <p><span class="mi" style="font-size:14px">info</span> Musik-Befehle:</p>
+      <ul style="margin:12px 0;padding-left:20px;color:rgba(255,255,255,0.7)">
+        <li><code>/play song: Titel oder URL</code> — Song abspielen (YouTube, Spotify, SoundCloud)</li>
+        <li><code>/skip</code> — Nächsten Song</li>
+        <li><code>/stop</code> — Stoppen & verlassen</li>
+        <li><code>/queue</code> — Warteschlange anzeigen</li>
+        <li><code>/volume 1-100</code> — Lautstärke</li>
+        <li><code>/nowplaying</code> — Aktueller Song</li>
+      </ul>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">info</span> Unterstützt YouTube, Spotify, SoundCloud, Twitch und lokale Dateien</p>
+    </div>
+  </div>
+</div>

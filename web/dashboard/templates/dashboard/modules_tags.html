@@ -1,0 +1,10 @@
+{% load dashboard_extras %}
+<div id="page-tags" class="page">
+  <div class="page-header"><h1><span class="mi">book</span> Tags / FAQ</h1><div class="module-toggle"><label class="toggle"><input type="checkbox" id="tags_enabled" onchange="updateSetting('tags_enabled', this.checked ? '1' : '0')"{% if settings|get:'tags_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div></div>
+  <div class="card"><div class="card-header"><h2>Verwaltung</h2></div>
+    <div class="card-body">
+      <p>Befehle: <code>/tag add name:"regeln" inhalt:"Text..."</code> <code>/tag remove</code> <code>/tag list</code></p>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">info</span> Nutzer rufen mit Prefix <code>?</code> auf: <code>?regeln</code></p>
+    </div>
+  </div>
+</div>

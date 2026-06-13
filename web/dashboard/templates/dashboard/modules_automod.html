@@ -1,0 +1,16 @@
+{% load dashboard_extras %}
+<div id="page-automod" class="page">
+  <div class="page-header">
+    <h1><span class="mi">smart_toy</span> AutoMod</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="automod_enabled" onchange="updateSetting('automod_enabled', this.checked ? '1' : '0')"{% if settings|get:'automod_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Filter</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Bad Words (komma-getrennt)</label><textarea id="automod_badwords" rows="3" placeholder="wort1, wort2, wort3" onchange="updateSetting('automod_badwords', this.value)">{{ settings|get:'automod_badwords'|default:'' }}</textarea></div>
+      <div style="display:flex;gap:32px;flex-wrap:wrap">
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="automod_block_links" onchange="updateSetting('automod_block_links', this.checked ? '1' : '0')"{% if settings|get:'automod_block_links' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Links blockieren</span></div>
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="automod_block_invites" onchange="updateSetting('automod_block_invites', this.checked ? '1' : '0')"{% if settings|get:'automod_block_invites' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Discord-Einladungen blockieren</span></div>
+      </div>
+    </div>
+  </div>
+</div>

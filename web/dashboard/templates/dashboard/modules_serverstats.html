@@ -1,0 +1,13 @@
+{% load dashboard_extras %}
+<div id="page-serverstats" class="page">
+  <div class="page-header">
+    <h1><span class="mi">bar_chart</span> Server Stats</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="serverstats_enabled" onchange="updateSetting('serverstats_enabled', this.checked ? '1' : '0')"{% if settings|get:'serverstats_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Kategorie</label>{% channel_select 'serverstats_category_id' 'Kategorie auswählen' 'category' %}<small>Voice-Channels werden automatisch erstellt</small></div>
+      <p style="color:rgba(255,255,255,0.6)"><span class="mi" style="font-size:13px">info</span> Alternativ <code>/serverstats #kategorie</code> im Discord nutzen</p>
+    </div>
+  </div>
+</div>

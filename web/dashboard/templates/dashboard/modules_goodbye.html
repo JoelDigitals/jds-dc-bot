@@ -1,0 +1,22 @@
+{% load dashboard_extras %}
+<div id="page-goodbye" class="page">
+  <div class="page-header">
+    <h1><span class="mi">logout</span> Verabschiedung</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="goodbye_enabled" onchange="updateSetting('goodbye_enabled', this.checked ? '1' : '0')"{% if settings|get:'goodbye_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Channel-Verabschiedung</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Channel</label>{% channel_select 'goodbye_channel_id' 'Channel auswählen' 'text' %}</div>
+      <div class="form-group"><label>Nachricht</label><textarea id="goodbye_message" rows="3" onchange="updateSetting('goodbye_message', this.value)">{{ settings|get:'goodbye_message'|default:'{user} hat den Server verlassen.' }}</textarea><small>{user}, {server}, {membercount}</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Private Verabschiedung (DM)</h2></div>
+    <div class="card-body">
+      <div class="module-toggle" style="margin-bottom:16px">
+        <label class="toggle"><input type="checkbox" id="goodbye_dm_enabled" onchange="updateSetting('goodbye_dm_enabled', this.checked ? '1' : '0')"{% if settings|get:'goodbye_dm_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label>
+        <span>DM aktivieren</span>
+      </div>
+      <div class="form-group"><label>DM-Nachricht</label><textarea id="goodbye_dm_message" rows="3" onchange="updateSetting('goodbye_dm_message', this.value)">{{ settings|get:'goodbye_dm_message'|default:'Schade, dass du {server} verlassen hast!' }}</textarea></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+[32m[2026-06-13 14:05:10] [OK][0m 📦 Datenbank initialisiert
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: birthday
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: clear
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: counting
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: cc
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: dashboard
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: economy
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: economy-admin
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: giveaway
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: leaderboard
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: ban
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: kick
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: warn
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: warns
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: poll
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: rank
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: reactionrole
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: remind
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: serverstats
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: suggest
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: tag
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: ticket
+[36m[2026-06-13 14:05:10] [INFO][0m Command loaded: verify
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: guildCreate
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: guildMemberAdd
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: guildMemberRemove
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: interactionCreate
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: messageCreate
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: messageDelete
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: messageUpdate
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: ready
+[36m[2026-06-13 14:05:10] [INFO][0m Event loaded: voiceStateUpdate
+node:events:485
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at startBotApi (C:\Users\Joel\Desktop\Joel Digitals\Programming\Discord Bot\src\bot\api.js:108:10)
+    at main (C:\Users\Joel\Desktop\Joel Digitals\Programming\Discord Bot\src\index.js:30:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}
+
+Node.js v24.4.1

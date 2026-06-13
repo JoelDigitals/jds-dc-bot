@@ -1,0 +1,18 @@
+{% load dashboard_extras %}
+<div id="page-autoresponder" class="page">
+  <div class="page-header">
+    <h1><span class="mi">repeat</span> Auto-Responder</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="autoresponder_enabled" onchange="updateSetting('autoresponder_enabled', this.checked ? '1' : '0')"{% if settings|get:'autoresponder_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Verwaltung</h2></div>
+    <div class="card-body">
+      <p>Befehle im Discord:</p>
+      <ul style="margin:12px 0;padding-left:20px;color:rgba(255,255,255,0.7)">
+        <li><code>/ar add trigger: "Stichwort" response: "Antwort"</code> — Auto-Response erstellen</li>
+        <li><code>/ar remove name: "..."</code> — Entfernen</li>
+        <li><code>/ar list</code> — Alle anzeigen</li>
+      </ul>
+      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">info</span> Der Bot antwortet automatisch auf Nachrichten, die den Trigger enthalten</p>
+    </div>
+  </div>
+</div>

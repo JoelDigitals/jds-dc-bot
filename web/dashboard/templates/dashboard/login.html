@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+{% load dashboard_extras %}
+<html lang="{{ LANG }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% _ 'login.title' %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:#0d1117; color:#e6edf3; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .mi { font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; font-size:22px; vertical-align:middle; line-height:1; display:inline-block; }
+    .card { background:#161b22; border:1px solid #30363d; border-radius:16px; padding:40px; width:100%; max-width:420px; }
+    h1 { font-size:24px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:12px; }
+    p { color:#8b949e; font-size:14px; margin-bottom:28px; }
+    .discord-btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:14px; background:#5865F2; color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; text-decoration:none; transition:all 0.2s; }
+    .discord-btn:hover { background:#4752C4; }
+    .divider { display:flex; align-items:center; gap:16px; margin:24px 0; color:#8b949e; font-size:13px; }
+    .divider::before, .divider::after { content:''; flex:1; height:1px; background:#30363d; }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:13px; font-weight:600; color:#c9d1d9; margin-bottom:6px; }
+    .form-group input { width:100%; padding:12px 14px; background:#0d1117; border:1px solid #30363d; border-radius:8px; color:#e6edf3; font-size:14px; outline:none; }
+    .form-group input:focus { border-color:#5865F2; }
+    .submit-btn { width:100%; padding:14px; background:#238636; color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+    .submit-btn:hover { background:#2ea043; }
+    .error { background:rgba(248,81,73,0.15); border:1px solid rgba(248,81,73,0.3); color:#f85149; padding:12px 16px; border-radius:10px; margin-bottom:20px; font-size:14px; display:flex; align-items:center; gap:8px; }
+    .link { text-align:center; margin-top:20px; font-size:14px; color:#8b949e; }
+    .link a { color:#58a6ff; text-decoration:none; }
+    .link a:hover { text-decoration:underline; }
+    .lang-bar { position:absolute; top:20px; right:24px; display:flex; gap:4px; }
+    .lang-bar a { font-size:13px; padding:4px 10px; border-radius:6px; text-decoration:none; font-weight:600; }
+    .lang-bar a.active { background:#5865F2; color:#fff; }
+    .lang-bar a:not(.active) { color:#8b949e; }
+    .lang-bar a:not(.active):hover { color:#c9d1d9; background:#1c2128; }
+  </style>
+</head>
+<body>
+  <div class="lang-bar">
+    <a href="{% url 'set_language' %}?lang=de&next={{ request.path|urlencode }}"{% if LANG == 'de' %} class="active"{% endif %}>DE</a>
+    <a href="{% url 'set_language' %}?lang=en&next={{ request.path|urlencode }}"{% if LANG == 'en' %} class="active"{% endif %}>EN</a>
+  </div>
+  <div class="card">
+    <h1><span class="mi" style="color:#5865F2">login</span> {% _ 'login.title' %}</h1>
+    <p>{% _ 'login.subtitle' %}</p>
+    <a href="{% url 'discord_login' %}" class="discord-btn">
+      <span class="mi">discord</span> {% _ 'login.discord' %}
+    </a>
+    <div class="divider">{% _ 'login.or' %}</div>
+    {% if error %}
+    <div class="error"><span class="mi" style="font-size:18px">error</span> {{ error }}</div>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group"><label>{% _ 'login.username' %}</label><input type="text" name="username" required></div>
+      <div class="form-group"><label>{% _ 'login.password' %}</label><input type="password" name="password" required></div>
+      <button type="submit" class="submit-btn">{% _ 'login.submit' %}</button>
+    </form>
+    <div class="link"><a href="{% url 'register' %}">{% _ 'login.register_here' %}</a></div>
+  </div>
+</body>
+</html>

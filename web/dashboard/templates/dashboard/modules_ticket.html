@@ -1,0 +1,147 @@
+{% load dashboard_extras %}
+<div id="page-ticket" class="page">
+  <div class="page-header">
+    <h1><span class="mi">support_agent</span> Tickets & Support</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="ticket_enabled" onchange="updateSetting('ticket_enabled', this.checked ? '1' : '0')"{% if settings|get:'ticket_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">category</span> Kategorie (Channel-Ziel)</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Kategorie (Channel-Gruppe für Tickets)</label>{% channel_select 'ticket_category_id' 'Kategorie auswählen' 'category' %}<small>Neue Tickets werden als Channel in dieser Kategorie erstellt</small></div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">list_alt</span> Ticket-Kategorien (Themen)</h2></div>
+    <div class="card-body">
+      <p style="margin-bottom:12px;color:rgba(255,255,255,0.6)">Erstelle Kategorien, aus denen Nutzer beim Ticket-Erstellen wählen können.</p>
+      <div id="ticketCategoriesContainer"></div>
+      <button onclick="addTicketCategory()" style="margin-top:8px;padding:10px 18px;background:#238636;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+        <span class="mi" style="font-size:16px">add</span> Kategorie hinzufügen
+      </button>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">settings</span> Einstellungen</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Staff-Rolle</label>{% role_select 'ticket_staff_role_id' 'Rolle auswählen' %}<small>Diese Rolle sieht alle Tickets und kann sie schließen</small></div>
+      <div class="form-group"><label>Ticket-Panel Titel</label><input type="text" id="ticket_panel_title" placeholder="Ticket erstellen" onchange="updateSetting('ticket_panel_title', this.value)" value="{{ settings|get:'ticket_panel_title'|default:'Ticket erstellen' }}"></div>
+      <div class="form-group"><label>Ticket-Panel Beschreibung</label><textarea id="ticket_panel_desc" rows="2" onchange="updateSetting('ticket_panel_desc', this.value)">{{ settings|get:'ticket_panel_desc'|default:'Klicke auf den Button, um ein Ticket zu erstellen.' }}</textarea></div>
+      <div class="form-group"><label>Begrüßungsnachricht (Embed)</label><textarea id="ticket_welcome_message" rows="3" onchange="updateSetting('ticket_welcome_message', this.value)">{{ settings|get:'ticket_welcome_message'|default:'Ein Teammitglied wird sich bald um dein Anliegen kümmern.' }}</textarea><small>Wird im Ticket-Channel als erste Nachricht gesendet</small></div>
+      <div class="form-group" style="margin-top:12px">
+        <label>Channel für das Ticket-Panel</label>
+        <select id="ticketPanelChannel" class="dc-select"><option value="">— Channel auswählen —</option></select>
+      </div>
+      <button onclick="var ch=document.getElementById('ticketPanelChannel').value;if(ch)sendTicketPanel(ch);else showToast('Bitte Channel auswählen');" style="margin-top:8px;padding:12px 24px;background:#5865F2;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">
+        <span class="mi" style="font-size:18px">send</span> Ticket-Panel senden
+      </button>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Offene Tickets</h2></div><div class="card-body" id="ticketList"><p style="color:rgba(255,255,255,0.5);">Lade...</p></div></div>
+</div>
+
+<script>
+var ticketCategories = [];
+var ticketCategoriesRaw = '{{ settings|get:'ticket_categories'|default:'[]'|escapejs }}';
+
+function loadTicketCategories() {
+  try {
+    ticketCategories = JSON.parse(ticketCategoriesRaw) || [];
+  } catch(e) { ticketCategories = []; }
+  if (!Array.isArray(ticketCategories)) ticketCategories = [];
+  renderTicketCategories();
+}
+
+function renderTicketCategories() {
+  var container = document.getElementById('ticketCategoriesContainer');
+  if (!container) return;
+  if (ticketCategories.length === 0) {
+    container.innerHTML = '<div style="padding:20px 16px;background:#0d1117;border:1px dashed #30363d;border-radius:10px;text-align:center;color:rgba(255,255,255,0.4);font-size:14px"><span class="mi" style="font-size:20px;display:block;margin-bottom:6px">playlist_add</span>Noch keine Kategorien</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < ticketCategories.length; i++) {
+    var cat = ticketCategories[i];
+    html += '<div style="background:#0d1117;border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:10px">';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+    html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Name</label><input type="text" class="tc-name" value="' + escHtml(cat.name || '') + '" onchange="updateTicketCategory(' + i + ')" placeholder="z.B. Support" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none;box-sizing:border-box"></div>';
+    html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Emoji</label><input type="text" class="tc-emoji" value="' + escHtml(cat.emoji || '') + '" onchange="updateTicketCategory(' + i + ')" placeholder="🔧" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none;box-sizing:border-box"></div>';
+    html += '</div>';
+    html += '<div style="margin-bottom:10px"><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Beschreibung</label><input type="text" class="tc-desc" value="' + escHtml(cat.description || '') + '" onchange="updateTicketCategory(' + i + ')" placeholder="Hilfe bei technischen Problemen" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none;box-sizing:border-box"></div>';
+    html += '<div style="display:flex;gap:10px;align-items:end">';
+    html += '<div style="flex:1"><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Staff-Rolle (optional)</label><select class="tc-role" onchange="updateTicketCategory(' + i + ')" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none">';
+    html += '<option value="">— Keine spezifische Rolle —</option>';
+    for (var r = 0; r < ROLES.length; r++) {
+      var sel = String(ROLES[r].id) === String(cat.staff_role_id || '') ? ' selected' : '';
+      html += '<option value="' + ROLES[r].id + '"' + sel + '>' + escHtml(ROLES[r].name) + '</option>';
+    }
+    html += '</select></div>';
+    html += '<button onclick="removeTicketCategory(' + i + ')" style="padding:8px 14px;background:#da3633;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap"><span class="mi" style="font-size:14px">delete</span> Entfernen</button>';
+    html += '</div></div>';
+  }
+  container.innerHTML = html;
+}
+
+function updateTicketCategory(index) {
+  var container = document.getElementById('ticketCategoriesContainer');
+  var cards = container.children;
+  if (index >= cards.length) return;
+  var card = cards[index];
+  ticketCategories[index].name = card.querySelector('.tc-name').value;
+  ticketCategories[index].emoji = card.querySelector('.tc-emoji').value;
+  ticketCategories[index].description = card.querySelector('.tc-desc').value;
+  ticketCategories[index].staff_role_id = card.querySelector('.tc-role').value;
+  saveTicketCategories();
+}
+
+function addTicketCategory() {
+  ticketCategories.push({ name: '', description: '', emoji: '', staff_role_id: '' });
+  renderTicketCategories();
+  saveTicketCategories();
+}
+
+function removeTicketCategory(index) {
+  ticketCategories.splice(index, 1);
+  renderTicketCategories();
+  saveTicketCategories();
+}
+
+function saveTicketCategories() {
+  updateSetting('ticket_categories', JSON.stringify(ticketCategories));
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+loadTicketCategories();
+
+function loadTicketList() {
+  if (!CURRENT_GUILD_ID) { document.getElementById('ticketList').innerHTML = '<p style="color:rgba(255,255,255,0.5);">Kein Server ausgewählt</p>'; return; }
+  fetch('/api/guild/' + CURRENT_GUILD_ID + '/tickets/')
+    .then(r => r.json())
+    .then(tickets => {
+      var el = document.getElementById('ticketList');
+      if (!Array.isArray(tickets) || tickets.length === 0) {
+        el.innerHTML = '<div style="padding:20px 16px;background:#0d1117;border:1px dashed #30363d;border-radius:10px;text-align:center;color:rgba(255,255,255,0.4);font-size:14px"><span class="mi" style="font-size:20px;display:block;margin-bottom:6px">check_circle</span>Keine offenen Tickets</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < tickets.length; i++) {
+        var t = tickets[i];
+        var d = t.created_at ? new Date(t.created_at).toLocaleString('de-DE') : '—';
+        html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#0d1117;border:1px solid #30363d;border-radius:8px;margin-bottom:6px">';
+        html += '<span class="mi" style="font-size:20px;color:#5865F2">support_agent</span>';
+        html += '<div style="flex:1;min-width:0">';
+        html += '<div style="font-weight:600;font-size:14px;color:#e6edf3">' + escHtml(t.subject || 'Support') + '</div>';
+        html += '<div style="font-size:12px;color:rgba(255,255,255,0.5)">Channel: &lt;#' + (t.channel_id || '?') + '&gt; &bull; User: &lt;@' + (t.user_id || '?') + '&gt; &bull; ' + d + '</div>';
+        html += '</div>';
+        html += '<button onclick="navigator.clipboard.writeText(\'' + (t.channel_id || '') + '\');showToast(\'Channel-ID kopiert\')" style="padding:6px 12px;background:#21262d;color:#c9d1d9;border:1px solid #30363d;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap" title="Channel-ID kopieren"><span class="mi" style="font-size:14px">content_copy</span></button>';
+        html += '</div>';
+      }
+      el.innerHTML = html;
+    })
+    .catch(function() {
+      document.getElementById('ticketList').innerHTML = '<p style="color:rgba(255,255,255,0.4);">Fehler beim Laden</p>';
+    });
+}
+
+loadTicketList();
+</script>

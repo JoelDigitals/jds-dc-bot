@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joel Digitals Bot Manager</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#5865F2,#57F287);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0;">JD</div>
+        <div><h2>Joel Digitals</h2><span style="font-size:11px;color:#8b949e;display:block;margin-top:-2px;">Bot Manager</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/" class="nav-item active"><span class="nav-icon"><span class="mi">dashboard</span></span> Dashboard</a>
+        <div class="nav-section">Kommunikation</div>
+        <a href="#" class="nav-item" onclick="showModule('welcome')"><span class="nav-icon"><span class="mi">diversity_3</span></span> Begrüßung</a>
+        <a href="#" class="nav-item" onclick="showModule('goodbye')"><span class="nav-icon"><span class="mi">logout</span></span> Verabschiedung</a>
+        <a href="#" class="nav-item" onclick="showModule('ticket')"><span class="nav-icon"><span class="mi">support_agent</span></span> Tickets</a>
+        <a href="#" class="nav-item" onclick="showModule('news')"><span class="nav-icon"><span class="mi">rss_feed</span></span> News / Blog</a>
+        <a href="#" class="nav-item" onclick="showModule('video')"><span class="nav-icon"><span class="mi">notifications</span></span> Social Alerts</a>
+        <a href="#" class="nav-item" onclick="showModule('suggestions')"><span class="nav-icon"><span class="mi">lightbulb</span></span> Suggestions</a>
+        <a href="#" class="nav-item" onclick="showModule('music')"><span class="nav-icon"><span class="mi">library_music</span></span> Music</a>
+        <div class="nav-section">Community</div>
+        <a href="#" class="nav-item" onclick="showModule('levels')"><span class="nav-icon"><span class="mi">emoji_events</span></span> Level System</a>
+        <a href="#" class="nav-item" onclick="showModule('reactionroles')"><span class="nav-icon"><span class="mi">assignment</span></span> Reaction Roles</a>
+        <a href="#" class="nav-item" onclick="showModule('giveaway')"><span class="nav-icon"><span class="mi">card_giftcard</span></span> Giveaways</a>
+        <a href="#" class="nav-item" onclick="showModule('autorole')"><span class="nav-icon"><span class="mi">group_add</span></span> Autorole</a>
+        <a href="#" class="nav-item" onclick="showModule('economy')"><span class="nav-icon"><span class="mi">account_balance</span></span> Economy</a>
+        <a href="#" class="nav-item" onclick="showModule('poll')"><span class="nav-icon"><span class="mi">how_to_vote</span></span> Umfragen</a>
+        <a href="#" class="nav-item" onclick="showModule('birthday')"><span class="nav-icon"><span class="mi">cake</span></span> Geburtstage</a>
+        <div class="nav-section">Sicherheit</div>
+        <a href="#" class="nav-item" onclick="showModule('moderation')"><span class="nav-icon"><span class="mi">gavel</span></span> Moderation</a>
+        <a href="#" class="nav-item" onclick="showModule('automod')"><span class="nav-icon"><span class="mi">smart_toy</span></span> AutoMod</a>
+        <a href="#" class="nav-item" onclick="showModule('logging')"><span class="nav-icon"><span class="mi">article</span></span> Logging</a>
+        <div class="nav-section">Extras</div>
+        <a href="#" class="nav-item" onclick="showModule('tempvoice')"><span class="nav-icon"><span class="mi">volume_up</span></span> Temp Voice</a>
+        <a href="#" class="nav-item" onclick="showModule('serverstats')"><span class="nav-icon"><span class="mi">bar_chart</span></span> Server Stats</a>
+        <a href="#" class="nav-item" onclick="showModule('customcommands')"><span class="nav-icon"><span class="mi">keyboard</span></span> Custom Commands</a>
+        <a href="#" class="nav-item" onclick="showModule('tags')"><span class="nav-icon"><span class="mi">book</span></span> Tags / FAQ</a>
+        <a href="#" class="nav-item" onclick="showModule('voicerole')"><span class="nav-icon"><span class="mi">headphones</span></span> Voice Roles</a>
+        <a href="#" class="nav-item" onclick="showModule('autoresponder')"><span class="nav-icon"><span class="mi">repeat</span></span> Auto-Responder</a>
+        <a href="#" class="nav-item" onclick="showModule('invitetracker')"><span class="nav-icon"><span class="mi">link</span></span> Invite Tracker</a>
+        <a href="#" class="nav-item" onclick="showModule('counting')"><span class="nav-icon"><span class="mi">pin</span></span> Counting Game</a>
+        <a href="#" class="nav-item" onclick="showModule('verification')"><span class="nav-icon"><span class="mi">verified</span></span> Verification</a>
+        <div class="nav-section">Design</div>
+        <a href="#" class="nav-item" onclick="showModule('design')"><span class="nav-icon"><span class="mi">palette</span></span> Bot Design</a>
+        <div class="nav-section">System</div>
+        <a href="{% url 'logout' %}" class="nav-item"><span class="nav-icon"><span class="mi">logout</span></span> Logout</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div id="page-dashboard" class="page active">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="lang-switch" style="display:flex;gap:4px;">
+              <a href="{% url 'set_language' %}?lang=de&next={{ request.path|urlencode }}?guild_id={{ guild_id|urlencode }}" style="font-size:13px;padding:4px 10px;border-radius:6px;text-decoration:none;font-weight:600;{% if LANG == 'de' %}background:#5865F2;color:#fff{% else %}color:#8b949e{% endif %}">DE</a>
+              <a href="{% url 'set_language' %}?lang=en&next={{ request.path|urlencode }}?guild_id={{ guild_id|urlencode }}" style="font-size:13px;padding:4px 10px;border-radius:6px;text-decoration:none;font-weight:600;{% if LANG == 'en' %}background:#5865F2;color:#fff{% else %}color:#8b949e{% endif %}">EN</a>
+            </div>
+            {% if user.profile.avatar_url %}
+            <img src="{{ user.profile.avatar_url }}" alt="" style="width:32px;height:32px;border-radius:50%;">
+            {% endif %}
+            <span style="color: #8b949e;font-size:14px;">{{ user.username }}</span>
+          </div>
+        </div>
+        {% if request.GET.saved %}
+        <div style="background:rgba(46,160,67,0.15);border:1px solid rgba(46,160,67,0.3);color:#3fb950;padding:12px 16px;border-radius:10px;margin-bottom:20px;display:flex;align-items:center;gap:8px;"><span class="mi" style="font-size:18px">check_circle</span> Einstellungen gespeichert!</div>
+        {% endif %}
+        {% if not bot_online %}
+        <div style="background:rgba(248,81,73,0.15);border:1px solid rgba(248,81,73,0.3);color:#f85149;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:14px;display:flex;align-items:center;gap:8px;">
+          <span class="mi" style="font-size:18px;color:#f85149">warning</span>
+          <span>Bot ist offline — Kanal- und Rollen-Dropdowns bleiben leer. Starte den Bot mit <code style="background:#0d1117;padding:2px 6px;border-radius:4px;">node src/index.js</code></span>
+        </div>
+        {% endif %}
+
+        <!-- Guild Selector -->
+        <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px;margin-bottom:24px;">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span style="font-weight:600;font-size:14px;">Server auswählen:</span>
+            {% if user_guilds %}
+            <select id="guildSelector" onchange="selectGuild(this.value)" style="flex:1;min-width:200px;padding:10px 14px;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;font-size:14px;outline:none;">
+              <option value="">— Server wählen —</option>
+              {% for g in user_guilds %}
+              <option value="{{ g.id }}"{% if guild_id == g.id %} selected{% endif %}>{{ g.name }}</option>
+              {% endfor %}
+            </select>
+            {% else %}
+            <input type="text" id="guildIdInput" placeholder="Server ID eingeben" value="{{ guild_id }}" style="flex:1;padding:10px 14px;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;font-size:14px;outline:none;">
+            <button onclick="selectGuild(document.getElementById('guildIdInput').value)" style="padding:10px 20px;background:#5865F2;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Verbinden</button>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if guild_id %}
+        <div style="display:flex;align-items:center;gap:12px;background:#161b22;border:1px solid #30363d;border-radius:10px;padding:12px 16px;margin-bottom:20px;">
+          <span class="mi" style="font-size:18px;color:#8b949e">dns</span>
+          <span style="flex:1;">Server: <code>{{ guild_id }}</code></span>
+        </div>
+        {% endif %}
+
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-icon mi" style="font-size:32px">diversity_3</div><div class="stat-info"><h3>Begrüßung</h3><p>Aktiv auf <strong id="welcomeCount">{{ welcome_count }}</strong> Servern</p></div></div>
+          <div class="stat-card"><div class="stat-icon mi" style="font-size:32px">support_agent</div><div class="stat-info"><h3>Tickets</h3><p><strong id="ticketCount">{{ ticket_count }}</strong> offene Tickets</p></div></div>
+          <div class="stat-card"><div class="stat-icon mi" style="font-size:32px">emoji_events</div><div class="stat-info"><h3>Level</h3><p><strong id="levelCount">{{ level_count }}</strong> Spieler</p></div></div>
+          <div class="stat-card"><div class="stat-icon mi" style="font-size:32px">gavel</div><div class="stat-info"><h3>Verwarnungen</h3><p><strong id="warnCount">{{ warn_count }}</strong> insgesamt</p></div></div>
+        </div>
+      </div>
+
+      {% include 'dashboard/modules_welcome.html' %}
+      {% include 'dashboard/modules_goodbye.html' %}
+      {% include 'dashboard/modules_ticket.html' %}
+      {% include 'dashboard/modules_news.html' %}
+      {% include 'dashboard/modules_video.html' %}
+      {% include 'dashboard/modules_suggestions.html' %}
+      {% include 'dashboard/modules_levels.html' %}
+      {% include 'dashboard/modules_reactionroles.html' %}
+      {% include 'dashboard/modules_giveaway.html' %}
+      {% include 'dashboard/modules_autorole.html' %}
+      {% include 'dashboard/modules_moderation.html' %}
+      {% include 'dashboard/modules_automod.html' %}
+      {% include 'dashboard/modules_logging.html' %}
+      {% include 'dashboard/modules_tempvoice.html' %}
+      {% include 'dashboard/modules_serverstats.html' %}
+      {% include 'dashboard/modules_customcommands.html' %}
+      {% include 'dashboard/modules_economy.html' %}
+      {% include 'dashboard/modules_poll.html' %}
+      {% include 'dashboard/modules_birthday.html' %}
+      {% include 'dashboard/modules_tags.html' %}
+      {% include 'dashboard/modules_counting.html' %}
+      {% include 'dashboard/modules_music.html' %}
+      {% include 'dashboard/modules_voicerole.html' %}
+      {% include 'dashboard/modules_autoresponder.html' %}
+      {% include 'dashboard/modules_invitetracker.html' %}
+      {% include 'dashboard/modules_design.html' %}
+      {% include 'dashboard/modules_verification.html' %}
+
+    </main>
+  </div>
+  <script>
+    var CURRENT_GUILD_ID = '{{ guild_id|escapejs }}';
+    var ROLES = {{ roles|safe }};
+    var CHANNELS = {{ channels|safe }};
+  </script>
+  <script src="{% static 'js/dashboard.js' %}"></script>
+</body>
+</html>

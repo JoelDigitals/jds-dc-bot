@@ -1,0 +1,12 @@
+{% load dashboard_extras %}
+<div id="page-autorole" class="page">
+  <div class="page-header">
+    <h1><span class="mi">group_add</span> Autorole</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="autorole_enabled" onchange="updateSetting('autorole_enabled', this.checked ? '1' : '0')"{% if settings|get:'autorole_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Einstellungen</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Join-Rolle</label>{% role_select 'autorole_role_id' 'Rolle auswählen' %}<small>Wird automatisch beim Beitritt vergeben</small></div>
+    </div>
+  </div>
+</div>

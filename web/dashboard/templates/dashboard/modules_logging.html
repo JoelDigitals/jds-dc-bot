@@ -1,0 +1,26 @@
+{% load dashboard_extras %}
+<div id="page-logging" class="page">
+  <div class="page-header">
+    <h1><span class="mi">article</span> Logging</h1>
+    <div class="module-toggle"><label class="toggle"><input type="checkbox" id="logging_enabled" onchange="updateSetting('logging_enabled', this.checked ? '1' : '0')"{% if settings|get:'logging_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
+  </div>
+  <div class="card"><div class="card-header"><h2>Log-Channel</h2></div>
+    <div class="card-body">
+      <div class="form-group"><label>Channel</label>{% channel_select 'logging_channel_id' 'Channel auswählen' 'text' %}</div>
+    </div>
+  </div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">tune</span> Log-Ereignisse</h2></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="log_messages" onchange="updateSetting('log_messages', this.checked ? '1' : '0')"{% if settings|get:'log_messages' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Nachrichten</span></div>
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="log_members" onchange="updateSetting('log_members', this.checked ? '1' : '0')"{% if settings|get:'log_members' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Mitglieder</span></div>
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="log_voice" onchange="updateSetting('log_voice', this.checked ? '1' : '0')"{% if settings|get:'log_voice' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Voice</span></div>
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="log_channels" onchange="updateSetting('log_channels', this.checked ? '1' : '0')"{% if settings|get:'log_channels' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Channels</span></div>
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="log_roles" onchange="updateSetting('log_roles', this.checked ? '1' : '0')"{% if settings|get:'log_roles' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Rollen</span></div>
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="log_moderation" onchange="updateSetting('log_moderation', this.checked ? '1' : '0')"{% if settings|get:'log_moderation' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Moderation</span></div>
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="log_joins" onchange="updateSetting('log_joins', this.checked ? '1' : '0')"{% if settings|get:'log_joins' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Beitritte</span></div>
+        <div class="module-toggle"><label class="toggle"><input type="checkbox" id="log_invites" onchange="updateSetting('log_invites', this.checked ? '1' : '0')"{% if settings|get:'log_invites' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Invites</span></div>
+      </div>
+    </div>
+  </div>
+</div>
