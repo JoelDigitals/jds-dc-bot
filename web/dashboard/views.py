@@ -150,25 +150,47 @@ def discord_callback(request):
     response = redirect('/')
     return response
 
-# --- Helper: Live-Daten aus Bot API ---
+# --- Helper: Discord REST API ---
 
-def fetch_bot_api(path):
-    """Ruft die Bot-API auf und gibt JSON zurück oder None."""
+def discord_api(path, method='GET', body=None):
+    """Ruft die Discord REST API direkt auf (mit Bot-Token)."""
+    token = settings.DISCORD_BOT_TOKEN
+    if not token:
+        return None
+    headers = {'Authorization': f'Bot {token}', 'Content-Type': 'application/json'}
     try:
-        r = requests.get(f'{settings.BOT_API_URL}{path}', timeout=5)
-        if r.status_code == 200:
+        if method == 'GET':
+            r = requests.get(f'https://discord.com/api/v10{path}', headers=headers, timeout=8)
+        else:
+            r = requests.post(f'https://discord.com/api/v10{path}', headers=headers, json=body, timeout=8)
+        if r.status_code in (200, 201, 204):
+            if r.status_code == 204:
+                return {}
             return r.json()
     except requests.RequestException:
         pass
     return None
 
+def discord_api_post(path, body):
+    return discord_api(path, 'POST', body)
+
+def fetch_channels(guild_id):
+    data = discord_api(f'/guilds/{guild_id}/channels')
+    if not data:
+        return []
+    allowed = {0, 2, 4, 5, 13, 15, 16}
+    return [{'id': c['id'], 'name': c['name'], 'type': c['type']} for c in data if c.get('type') in allowed]
+
+def fetch_roles(guild_id):
+    data = discord_api(f'/guilds/{guild_id}/roles')
+    if not data:
+        return []
+    return [{'id': r['id'], 'name': r['name'], 'color': '#' + hex(r.get('color', 0))[2:].zfill(6)} for r in data if r.get('name') != '@everyone']
+
 def bot_is_online():
-    """Prüft ob die Bot-API erreichbar ist."""
-    try:
-        r = requests.get(f'{settings.BOT_API_URL}/api/guilds', timeout=3)
-        return r.status_code == 200
-    except:
-        return False
+    """Prüft ob der Bot-Token gültig ist."""
+    data = discord_api('/gateway/bot')
+    return data is not None
 
 # --- Dashboard / Landing ---
 
@@ -197,9 +219,9 @@ def dashboard(request):
             settings = GuildSettings.objects.get(guild_id=guild_id)
         except GuildSettings.DoesNotExist:
             pass
-        # Live-Daten vom Bot holen
-        channels = fetch_bot_api(f'/api/guild/channels?guildId={guild_id}') or []
-        roles = fetch_bot_api(f'/api/guild/roles?guildId={guild_id}') or []
+        # Live-Daten von Discord
+        channels = fetch_channels(guild_id)
+        roles = fetch_roles(guild_id)
 
     # Discord-connected guilds — filtere nur Server, die den Bot haben
     user_guilds = []
@@ -228,8 +250,8 @@ def dashboard(request):
                         settings = GuildSettings.objects.get(guild_id=guild_id)
                     except GuildSettings.DoesNotExist:
                         pass
-                    channels = fetch_bot_api(f'/api/guild/channels?guildId={guild_id}') or []
-                    roles = fetch_bot_api(f'/api/guild/roles?guildId={guild_id}') or []
+                    channels = fetch_channels(guild_id)
+                    roles = fetch_roles(guild_id)
     except (Profile.DoesNotExist, AttributeError, requests.RequestException):
         pass
 
@@ -377,24 +399,40 @@ def api_send_ticket_panel(request):
         gs = GuildSettings.objects.get(guild_id=guild_id)
     except GuildSettings.DoesNotExist:
         gs = None
-    r = requests.post(f'{settings.BOT_API_URL}/api/send/ticket-panel', json={
-        'guildId': guild_id,
-        'channelId': channel_id,
-        'settings': {
-            'embed_color': gs.embed_color if gs else None,
-            'embed_footer': gs.embed_footer if gs else None,
-            'ticket_banner_url': gs.ticket_banner_url if gs else None,
-            'ticket_panel_title': gs.ticket_panel_title if gs else None,
-            'ticket_panel_desc': gs.ticket_panel_desc if gs else None,
-        }
-    }, timeout=5)
-    try:
-        data = r.json()
-    except:
-        data = {}
-    if r.status_code == 200:
-        return JsonResponse({'success': True, **data})
-    return JsonResponse({'error': data.get('error', 'Fehler beim Senden')}, status=400)
+
+    color = (gs.embed_color or '#5865F2').replace('#', '')
+    title = (gs.ticket_panel_title if gs else None) or 'Ticket erstellen'
+    desc = (gs.ticket_panel_desc if gs else None) or 'Klicke auf den Button, um ein Ticket zu erstellen.'
+
+    embed = {
+        'color': int(color, 16),
+        'title': title,
+        'description': desc,
+        'timestamp': '__NOW__',
+    }
+    if gs and gs.embed_footer:
+        embed['footer'] = {'text': gs.embed_footer}
+    if gs and gs.ticket_banner_url:
+        embed['image'] = {'url': gs.ticket_banner_url}
+
+    body = {
+        'embeds': [embed],
+        'components': [{
+            'type': 1,
+            'components': [{
+                'type': 2,
+                'style': 1,
+                'label': 'Ticket erstellen',
+                'custom_id': 'create_ticket',
+                'emoji': {'name': '🎫'},
+            }]
+        }]
+    }
+
+    r = discord_api_post(f'/channels/{channel_id}/messages', body)
+    if r is not None:
+        return JsonResponse({'success': True, 'id': r.get('id', '')})
+    return JsonResponse({'error': 'Fehler beim Senden'}, status=400)
 
 @login_required
 @csrf_exempt
@@ -409,20 +447,21 @@ def api_send_test_embed(request):
         gs = GuildSettings.objects.get(guild_id=guild_id)
     except GuildSettings.DoesNotExist:
         gs = None
-    embed_color = gs.embed_color if gs else '#5865F2'
-    embed_footer = gs.embed_footer if gs else None
-    r = requests.post(f'{settings.BOT_API_URL}/api/send/embed', json={
-        'guildId': guild_id,
-        'channelId': channel_id,
+
+    color = (gs.embed_color if gs else None) or '#5865F2'
+    footer = (gs.embed_footer if gs else None) or 'keiner'
+
+    embed = {
+        'color': int(color.replace('#', ''), 16),
         'title': 'Test Embed',
-        'description': 'Dies ist ein Test-Embed mit deinen aktuellen Design-Einstellungen.\n\n✅ Farbe: ' + embed_color + '\n✅ Footer: ' + (embed_footer or 'keiner'),
-        'color': embed_color,
-        'footer': embed_footer,
-    }, timeout=5)
-    try:
-        data = r.json()
-    except:
-        data = {}
-    if r.status_code == 200:
-        return JsonResponse({'success': True, **data})
-    return JsonResponse({'error': data.get('error', 'Fehler beim Senden')}, status=400)
+        'description': f'Dies ist ein Test-Embed mit deinen aktuellen Design-Einstellungen.\n\n✅ Farbe: {color}\n✅ Footer: {footer}',
+        'timestamp': '__NOW__',
+    }
+    if gs and gs.embed_footer:
+        embed['footer'] = {'text': gs.embed_footer}
+
+    body = {'embeds': [embed]}
+    r = discord_api_post(f'/channels/{channel_id}/messages', body)
+    if r is not None:
+        return JsonResponse({'success': True, 'id': r.get('id', '')})
+    return JsonResponse({'error': 'Fehler beim Senden'}, status=400)

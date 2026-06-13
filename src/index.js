@@ -26,8 +26,10 @@ async function main() {
   // Make client globally accessible
   global.botClient = client;
 
-  // Start bot API for Django
-  startBotApi(client);
+  // Start bot API for Django (not needed on Render — Django uses Discord REST API directly)
+  if (!process.env.RENDER) {
+    startBotApi(client);
+  }
 
   // Bot ready
   client.once('ready', async () => {
