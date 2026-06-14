@@ -1,42 +1,115 @@
 {% load dashboard_extras %}
 <div id="page-video" class="page">
   <div class="page-header">
-    <h1><span class="mi">notifications</span> Video & Social Benachrichtigungen</h1>
+    <h1><span class="mi">notifications</span> Video & Social</h1>
     <div class="module-toggle"><label class="toggle"><input type="checkbox" id="video_enabled" onchange="updateSetting('video_enabled', this.checked ? '1' : '0')"{% if settings|get:'video_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
   </div>
-  <div class="card"><div class="card-header"><h2><span class="mi" style="color:#ff0000">play_circle</span> YouTube</h2></div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">campaign</span> Standard-Channel</h2></div>
     <div class="card-body">
-      <div class="form-group"><label>Channel</label>{% channel_select 'video_channel_id' 'Channel auswählen' 'text' %}</div>
-      <div class="form-group"><label>YouTube Channel URL</label><input type="url" id="video_youtube_channel" placeholder="https://youtube.com/@Kanal oder /channel/UC..." onchange="updateSetting('video_youtube_channel', this.value)" value="{{ settings|get:'video_youtube_channel'|default:'' }}"><small>Benachrichtigt bei neuen Videos</small></div>
+      <div class="form-group"><label>Standard Video-Channel</label>{% channel_select 'video_channel_id' 'Channel auswählen' 'text' %}<small>Fallback-Channel für Feeds ohne eigenen Channel. Ankündigungs-Channels werden automatisch veröffentlicht.</small></div>
     </div>
   </div>
-  <div class="card"><div class="card-header"><h2><span class="mi" style="color:#000000">music_note</span> TikTok</h2></div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">play_circle</span> Video & Social Feeds</h2></div>
     <div class="card-body">
-      <div class="form-group"><label>TikTok Channel</label>{% channel_select 'video_tiktok_channel_id' 'Channel auswählen' 'text' %}</div>
-      <div class="form-group"><label>TikTok Benutzername</label><input type="text" id="video_tiktok_user" placeholder="@benutzername" onchange="updateSetting('video_tiktok_user', this.value)" value="{{ settings|get:'video_tiktok_user'|default:'' }}"><small>Benachrichtigt bei neuen TikTok-Videos</small></div>
+      <p style="margin-bottom:12px;color:rgba(255,255,255,0.6)">Füge YouTube-Kanäle, TikTok/Instagram/Twitch (per RSS-Bridge) hinzu. Jeder Feed hat einen eigenen Channel.</p>
+      <div id="videoFeedsContainer"></div>
+      <button onclick="addVideoFeed()" style="margin-top:8px;padding:10px 18px;background:#238636;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+        <span class="mi" style="font-size:16px">add</span> Feed hinzufügen
+      </button>
     </div>
   </div>
-  <div class="card"><div class="card-header"><h2><span class="mi" style="color:#9146ff">live_tv</span> Twitch</h2></div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">settings</span> Einstellungen</h2></div>
     <div class="card-body">
-      <div class="form-group"><label>Twitch Channel</label>{% channel_select 'video_twitch_channel_id' 'Channel auswählen' 'text' %}</div>
-      <div class="form-group"><label>Twitch Kanalname</label><input type="text" id="video_twitch_user" placeholder="kanalname" onchange="updateSetting('video_twitch_user', this.value)" value="{{ settings|get:'video_twitch_user'|default:'' }}"><small>Benachrichtigt bei Live-Streams</small></div>
-    </div>
-  </div>
-  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">alternate_email</span> Twitter / X</h2></div>
-    <div class="card-body">
-      <div class="form-group"><label>Twitter Channel</label>{% channel_select 'video_twitter_channel_id' 'Channel auswählen' 'text' %}</div>
-      <div class="form-group"><label>Twitter Benutzername</label><input type="text" id="video_twitter_user" placeholder="@benutzername" onchange="updateSetting('video_twitter_user', this.value)" value="{{ settings|get:'video_twitter_user'|default:'' }}"><small>Benachrichtigt bei neuen Tweets</small></div>
-    </div>
-  </div>
-  <div class="card"><div class="card-header"><h2><span class="mi" style="color:#e4405f">photo_camera</span> Instagram</h2></div>
-    <div class="card-body">
-      <div class="form-group"><label>Instagram Channel</label>{% channel_select 'video_instagram_channel_id' 'Channel auswählen' 'text' %}</div>
-      <div class="form-group"><label>Instagram Benutzername</label><input type="text" id="video_instagram_user" placeholder="@benutzername" onchange="updateSetting('video_instagram_user', this.value)" value="{{ settings|get:'video_instagram_user'|default:'' }}"><small>Benachrichtigt bei neuen Posts</small></div>
-    </div>
-  </div>
-  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">campaign</span> Ping-Rolle</h2></div>
-    <div class="card-body">
-      <div class="form-group"><label>Rolle pingen bei neuen Posts</label>{% role_select 'video_ping_role_id' 'Keine Ping-Rolle' %}<small>Wähle eine Rolle, die bei neuen Videos/Posts benachrichtigt wird</small></div>
+      <div class="form-group"><label>Standard Ping-Rolle</label>{% role_select 'video_ping_role_id' 'Keine Ping-Rolle' %}<small>Fallback für Feeds ohne eigene Rolle</small></div>
     </div>
   </div>
 </div>
+
+<script>
+var videoFeeds = [];
+var videoFeedsRaw = '{{ settings|get:'video_feeds'|default:'[]'|escapejs }}';
+
+function loadVideoFeeds() {
+  try { videoFeeds = JSON.parse(videoFeedsRaw) || []; } catch(e) { videoFeeds = []; }
+  if (!Array.isArray(videoFeeds)) videoFeeds = [];
+  renderVideoFeeds();
+}
+
+function renderVideoFeeds() {
+  var container = document.getElementById('videoFeedsContainer');
+  if (!container) return;
+  if (videoFeeds.length === 0) {
+    container.innerHTML = '<div style="padding:20px 16px;background:#0d1117;border:1px dashed #30363d;border-radius:10px;text-align:center;color:rgba(255,255,255,0.4);font-size:14px"><span class="mi" style="font-size:20px;display:block;margin-bottom:6px">playlist_add</span>Noch keine Feeds konfiguriert</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < videoFeeds.length; i++) {
+    var f = videoFeeds[i];
+    html += '<div style="background:#0d1117;border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:10px">';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+    html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Name</label><input type="text" class="vf-name" value="' + escHtml(f.name || '') + '" onchange="updateVideoFeed(' + i + ')" placeholder="z.B. Joel Digitals YT" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none;box-sizing:border-box"></div>';
+    html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Plattform</label><select class="vf-platform" onchange="updateVideoFeed(' + i + ')" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none">';
+    html += '<option value="youtube"' + (f.platform === 'youtube' ? ' selected' : '') + '>YouTube</option>';
+    html += '<option value="tiktok"' + (f.platform === 'tiktok' ? ' selected' : '') + '>TikTok (RSS)</option>';
+    html += '<option value="instagram"' + (f.platform === 'instagram' ? ' selected' : '') + '>Instagram (RSS)</option>';
+    html += '<option value="twitch"' + (f.platform === 'twitch' ? ' selected' : '') + '>Twitch (RSS)</option>';
+    html += '<option value="twitter"' + (f.platform === 'twitter' ? ' selected' : '') + '>Twitter/X (RSS)</option>';
+    html += '<option value="other"' + (f.platform === 'other' ? ' selected' : '') + '>Anderes</option>';
+    html += '</select></div>';
+    html += '</div>';
+    html += '<div style="margin-bottom:10px"><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">URL / RSS-URL <span style="color:rgba(255,255,255,0.3);font-weight:normal">(YouTube: Kanal-Link | Andere: RSS-Bridge-URL)</span></label><input type="url" class="vf-url" value="' + escHtml(f.url || '') + '" onchange="updateVideoFeed(' + i + ')" placeholder="https://..." style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none;box-sizing:border-box"></div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+    html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Channel (optional)</label><select class="vf-channel" onchange="updateVideoFeed(' + i + ')" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none">';
+    html += '<option value="">— Standard verwenden —</option>';
+    for (var c = 0; c < CHANNELS.length; c++) {
+      if (CHANNELS[c].type === 0 || CHANNELS[c].type === 5) {
+        var csel = String(CHANNELS[c].id) === String(f.channel_id || '') ? ' selected' : '';
+        html += '<option value="' + CHANNELS[c].id + '"' + csel + '>' + escHtml(CHANNELS[c].name) + '</option>';
+      }
+    }
+    html += '</select></div>';
+    html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Ping-Rolle (optional)</label><select class="vf-role" onchange="updateVideoFeed(' + i + ')" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none">';
+    html += '<option value="">— Standard verwenden —</option>';
+    for (var r = 0; r < ROLES.length; r++) {
+      var sel = String(ROLES[r].id) === String(f.ping_role_id || '') ? ' selected' : '';
+      html += '<option value="' + ROLES[r].id + '"' + sel + '>' + escHtml(ROLES[r].name) + '</option>';
+    }
+    html += '</select></div>';
+    html += '</div>';
+    html += '<button onclick="removeVideoFeed(' + i + ')" style="padding:8px 14px;background:#da3633;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px"><span class="mi" style="font-size:14px">delete</span> Entfernen</button>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function updateVideoFeed(index) {
+  var container = document.getElementById('videoFeedsContainer');
+  var cards = container.children;
+  if (index >= cards.length) return;
+  var card = cards[index];
+  videoFeeds[index].name = card.querySelector('.vf-name').value;
+  videoFeeds[index].platform = card.querySelector('.vf-platform').value;
+  videoFeeds[index].url = card.querySelector('.vf-url').value;
+  videoFeeds[index].channel_id = card.querySelector('.vf-channel').value;
+  videoFeeds[index].ping_role_id = card.querySelector('.vf-role').value;
+  saveVideoFeeds();
+}
+
+function addVideoFeed() {
+  videoFeeds.push({ name: '', platform: 'youtube', url: '', channel_id: '', ping_role_id: '' });
+  renderVideoFeeds();
+  saveVideoFeeds();
+}
+
+function removeVideoFeed(index) {
+  videoFeeds.splice(index, 1);
+  renderVideoFeeds();
+  saveVideoFeeds();
+}
+
+function saveVideoFeeds() {
+  updateSetting('video_feeds', JSON.stringify(videoFeeds));
+}
+
+loadVideoFeeds();
+</script>

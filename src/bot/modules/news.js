@@ -53,7 +53,7 @@ function parseFeeds(settings) {
       const parsed = JSON.parse(settings.news_rss_feeds);
       if (Array.isArray(parsed)) {
         for (const f of parsed) {
-          if (f.url) feeds.push({ url: f.url, name: f.name || '', pingRoleId: f.ping_role_id || null });
+          if (f.url) feeds.push({ url: f.url, name: f.name || '', pingRoleId: f.ping_role_id || null, channelId: f.channel_id || null });
         }
       }
     } catch {}
@@ -117,16 +117,19 @@ async function checkNews(client) {
   for (const guild of client.guilds.cache.values()) {
     try {
       const settings = await db.getSettings(guild.id);
-      if (!settings.news_enabled || !settings.news_channel_id) continue;
-
-      const channel = guild.channels.cache.get(settings.news_channel_id);
-      if (!channel) continue;
+      if (!settings.news_enabled) continue;
 
       const feeds = parseFeeds(settings);
       if (!feeds.length) continue;
 
       for (const feed of feeds) {
         try {
+          // Use feed-specific channel, fallback to global
+          const chId = feed.channelId || settings.news_channel_id;
+          if (!chId) continue;
+          const channel = guild.channels.cache.get(chId);
+          if (!channel) continue;
+
           await processFeed(client, guild, channel, feed, settings);
         } catch (err) {
           logger.error(`News feed error for ${guild.name} (${feed.url}): ${err.message}`);

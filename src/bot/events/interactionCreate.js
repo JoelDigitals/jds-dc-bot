@@ -1,7 +1,7 @@
 const { handleTicketCreate, handleTicketClose, handleTicketCategorySelect, handleTicketReasonSubmit, handleTicketCloseReasonSubmit } = require('../modules/ticket');
 const { handleReactionRoleClick } = require('../modules/reactionroles');
 const { handleSuggestionAction } = require('../modules/suggestions');
-const { handleVerify } = require('../modules/verification');
+const { handleVerify, isVerified } = require('../modules/verification');
 
 module.exports = {
   name: 'interactionCreate',
@@ -18,7 +18,7 @@ module.exports = {
       if (['suggest_approve', 'suggest_deny', 'suggest_implement'].includes(interaction.customId)) {
         return handleSuggestionAction(interaction);
       }
-      if (interaction.customId === 'verify_me') return handleVerify(interaction);
+      if (['verify_me', 'verify_de', 'verify_en'].includes(interaction.customId)) return handleVerify(interaction);
     }
 
     // Select menu interactions
@@ -35,6 +35,17 @@ module.exports = {
 
     // Slash commands
     if (!interaction.isChatInputCommand()) return;
+
+    // Block unverified users
+    if (interaction.guild) {
+      const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+      if (member && !(await isVerified(interaction.guild, member))) {
+        return interaction.reply({
+          content: '❌ Du musst dich zuerst verifizieren! Nutze den Verifikations-Button in der Willkommens-Nachricht.',
+          ephemeral: true,
+        });
+      }
+    }
 
     const command = interaction.client.commands.get(interaction.commandName);
     if (!command) return;

@@ -43,6 +43,7 @@ class GuildSettings(models.Model):
     video_instagram_channel_id = models.TextField(null=True, blank=True)
     video_instagram_user = models.TextField(null=True, blank=True)
     video_ping_role_id = models.TextField(null=True, blank=True)
+    video_feeds = models.TextField(null=True, blank=True)
     news_ping_role_id = models.TextField(null=True, blank=True)
     news_rss_feeds = models.TextField(null=True, blank=True)
     rss_ping_role_id = models.TextField(null=True, blank=True)

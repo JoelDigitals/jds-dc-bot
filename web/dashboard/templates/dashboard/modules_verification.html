@@ -1,11 +1,22 @@
 {% load dashboard_extras %}
 <div id="page-verification" class="page">
   <div class="page-header"><h1><span class="mi">verified</span> Verification</h1><div class="module-toggle"><label class="toggle"><input type="checkbox" id="verification_enabled" onchange="updateSetting('verification_enabled', this.checked ? '1' : '0')"{% if settings|get:'verification_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div></div>
-  <div class="card"><div class="card-header"><h2>Einrichtung</h2></div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">translate</span> Einrichtung (DE/EN)</h2></div>
     <div class="card-body">
-      <p>1. <code>/verify setup @Rolle</code> — Rolle festlegen</p>
-      <p>2. <code>/verify panel</code> — Button-Panel senden</p>
-      <p style="color:rgba(255,255,255,0.5);font-size:13px"><span class="mi" style="font-size:13px">check_circle</span> Nutzer klicken auf Button → erhalten die Rolle</p>
+      <p style="color:rgba(255,255,255,0.6);margin-bottom:12px">Zwei Buttons im Panel — Nutzer wählen ihre Sprache und erhalten die passende Rolle. Nur Verifizierte können Commands nutzen.</p>
+      <p>1. <strong>Rollen erstellen</strong> (z.B. <code>@Verified-DE</code> und <code>@Verified-EN</code>)</p>
+      <p>2. <code>/verify setup @Verified-DE @Verified-EN</code> — optional mit <code>base_rolle</code> für beide</p>
+      <p>3. <code>/verify panel</code> — Panel senden</p>
+      <div style="margin-top:16px;padding:16px;background:#0d1117;border:1px solid #30363d;border-radius:10px">
+        <h3 style="font-size:14px;margin-bottom:8px;color:#e6edf3">Buttons im Panel</h3>
+        <div style="display:flex;gap:12px">
+          <span style="padding:6px 14px;background:#238636;border-radius:6px;font-size:13px;color:#fff">🇩🇪 Verifizieren (DE)</span>
+          <span style="padding:6px 14px;background:#5865F2;border-radius:6px;font-size:13px;color:#fff">🇬🇧 Verify (EN)</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:12px 16px;background:#da363310;border:1px solid #da363330;border-radius:8px;color:#f85149;font-size:13px">
+        <span class="mi" style="font-size:14px">warning</span> Nicht verifizierte Nutzer können <strong>keine</strong> Slash-Commands ausführen.
+      </div>
     </div>
   </div>
 </div>

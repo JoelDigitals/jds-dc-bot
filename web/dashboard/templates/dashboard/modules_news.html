@@ -4,14 +4,14 @@
     <h1><span class="mi">rss_feed</span> News & Blog</h1>
     <div class="module-toggle"><label class="toggle"><input type="checkbox" id="news_enabled" onchange="updateSetting('news_enabled', this.checked ? '1' : '0')"{% if settings|get:'news_enabled' == '1' %} checked{% endif %}><span class="slider"></span></label><span>Modul aktivieren</span></div>
   </div>
-  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">campaign</span> Ziel-Channel</h2></div>
+  <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">campaign</span> Standard-Channel</h2></div>
     <div class="card-body">
-      <div class="form-group"><label>News-Channel</label>{% channel_select 'news_channel_id' 'Channel auswählen' 'text' %}<small>In diesen Channel werden neue Artikel gepostet. Ankündigungs-Channels werden automatisch veröffentlicht.</small></div>
+      <div class="form-group"><label>Standard News-Channel</label>{% channel_select 'news_channel_id' 'Channel auswählen' 'text' %}<small>Fallback-Channel für Feeds ohne eigenen Channel. Ankündigungs-Channels werden automatisch veröffentlicht.</small></div>
     </div>
   </div>
   <div class="card"><div class="card-header"><h2><span class="mi" style="font-size:18px">rss_feed</span> RSS Feeds</h2></div>
     <div class="card-body">
-      <p style="margin-bottom:12px;color:rgba(255,255,255,0.6)">Füge mehrere RSS-Feeds hinzu. Jeder Feed kann einen eigenen Namen und eine eigene Ping-Rolle haben.</p>
+      <p style="margin-bottom:12px;color:rgba(255,255,255,0.6)">Jeder Feed kann einen eigenen Namen, Channel und Ping-Rolle haben. Ohne eigenen Channel wird der Standard-Channel verwendet.</p>
       <div id="newsFeedsContainer"></div>
       <button onclick="addNewsFeed()" style="margin-top:8px;padding:10px 18px;background:#238636;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
         <span class="mi" style="font-size:16px">add</span> Feed hinzufügen
@@ -52,15 +52,25 @@ function renderNewsFeeds() {
     html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Name</label><input type="text" class="nf-name" value="' + escHtml(f.name || '') + '" onchange="updateNewsFeed(' + i + ')" placeholder="z.B. Tech-Blog" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none;box-sizing:border-box"></div>';
     html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">RSS URL</label><input type="url" class="nf-url" value="' + escHtml(f.url || '') + '" onchange="updateNewsFeed(' + i + ')" placeholder="https://example.com/rss" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none;box-sizing:border-box"></div>';
     html += '</div>';
-    html += '<div style="display:flex;gap:10px;align-items:end">';
-    html += '<div style="flex:1"><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Ping-Rolle (optional)</label><select class="nf-role" onchange="updateNewsFeed(' + i + ')" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none">';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+    html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Channel (optional)</label><select class="nf-channel" onchange="updateNewsFeed(' + i + ')" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none">';
+    html += '<option value="">— Standard verwenden —</option>';
+    for (var c = 0; c < CHANNELS.length; c++) {
+      if (CHANNELS[c].type === 0 || CHANNELS[c].type === 5) {
+        var csel = String(CHANNELS[c].id) === String(f.channel_id || '') ? ' selected' : '';
+        html += '<option value="' + CHANNELS[c].id + '"' + csel + '>' + escHtml(CHANNELS[c].name) + '</option>';
+      }
+    }
+    html += '</select></div>';
+    html += '<div><label style="display:block;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px">Ping-Rolle (optional)</label><select class="nf-role" onchange="updateNewsFeed(' + i + ')" style="width:100%;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px;outline:none">';
     html += '<option value="">— Standard verwenden —</option>';
     for (var r = 0; r < ROLES.length; r++) {
       var sel = String(ROLES[r].id) === String(f.ping_role_id || '') ? ' selected' : '';
       html += '<option value="' + ROLES[r].id + '"' + sel + '>' + escHtml(ROLES[r].name) + '</option>';
     }
     html += '</select></div>';
-    html += '<button onclick="removeNewsFeed(' + i + ')" style="padding:8px 14px;background:#da3633;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;white-space:nowrap"><span class="mi" style="font-size:14px">delete</span> Entfernen</button>';
+    html += '</div>';
+    html += '<button onclick="removeNewsFeed(' + i + ')" style="padding:8px 14px;background:#da3633;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px"><span class="mi" style="font-size:14px">delete</span> Entfernen</button>';
     html += '</div></div>';
   }
   container.innerHTML = html;
@@ -73,12 +83,13 @@ function updateNewsFeed(index) {
   var card = cards[index];
   newsFeeds[index].name = card.querySelector('.nf-name').value;
   newsFeeds[index].url = card.querySelector('.nf-url').value;
+  newsFeeds[index].channel_id = card.querySelector('.nf-channel').value;
   newsFeeds[index].ping_role_id = card.querySelector('.nf-role').value;
   saveNewsFeeds();
 }
 
 function addNewsFeed() {
-  newsFeeds.push({ name: '', url: '', ping_role_id: '' });
+  newsFeeds.push({ name: '', url: '', channel_id: '', ping_role_id: '' });
   renderNewsFeeds();
   saveNewsFeeds();
 }
