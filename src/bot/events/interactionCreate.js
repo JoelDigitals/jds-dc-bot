@@ -36,14 +36,17 @@ module.exports = {
     // Slash commands
     if (!interaction.isChatInputCommand()) return;
 
-    // Block unverified users
+    // Block unverified users (skip admins and server owner)
     if (interaction.guild) {
       const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
       if (member && !(await isVerified(interaction.guild, member))) {
-        return interaction.reply({
-          content: '❌ Du musst dich zuerst verifizieren! Nutze den Verifikations-Button in der Willkommens-Nachricht.',
-          ephemeral: true,
-        });
+        const isAdmin = member.permissions.has('Administrator') || interaction.user.id === interaction.guild.ownerId;
+        if (!isAdmin) {
+          return interaction.reply({
+            content: '❌ Du musst dich zuerst verifizieren! Nutze den Verifikations-Button in der Willkommens-Nachricht.',
+            ephemeral: true,
+          });
+        }
       }
     }
 
