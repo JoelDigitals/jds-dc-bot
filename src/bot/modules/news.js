@@ -10,25 +10,45 @@ const parser = new RssParser({
 });
 
 function extractImage(item) {
-  if (item.enclosure?.url && /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(item.enclosure.url)) {
-    return item.enclosure.url;
-  }
+  // 1. enclosure (RSS standard)
+  if (item.enclosure?.url) return item.enclosure.url;
+
+  // 2. media:content (WordPress featured image)
   if (item['media:content']) {
     const mc = Array.isArray(item['media:content']) ? item['media:content'][0] : item['media:content'];
     if (mc?.$?.url) return mc.$.url;
   }
+
+  // 3. media:thumbnail
   if (item['media:thumbnail']) {
     const mt = Array.isArray(item['media:thumbnail']) ? item['media:thumbnail'][0] : item['media:thumbnail'];
     if (mt?.$?.url) return mt.$.url;
+    if (typeof mt === 'string') return mt;
   }
-  if (item['content:encoded']) {
-    const match = item['content:encoded'].match(/<img[^>]+src=["']([^"']+)["']/i);
-    if (match) return match[1];
+
+  // 4. itunes:image
+  if (item.itunes?.image) return item.itunes.image;
+
+  // 5. [Bild: URL] format (Blogger / custom CMS)
+  const textData = item['content:encoded'] || item.content || '';
+  let m = textData.match(/\[Bild:\s*(https?:\/\/[^\]]+\.(?:png|jpg|jpeg|gif|webp)[^\]]*)\]/i);
+  if (!m) m = textData.match(/\[Image:\s*(https?:\/\/[^\]]+\.(?:png|jpg|jpeg|gif|webp)[^\]]*)\]/i);
+  if (m) return m[1].split('?')[0];
+
+  // 6. og:image / twitter:image from content
+  m = textData.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
+  if (!m) m = textData.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i);
+  if (m) return m[1];
+
+  // 7. Standard img tag
+  m = textData.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (m) return m[1];
+
+  // 8. link-based: link itself is an image
+  if (item.link && /\.(png|jpg|jpeg|gif|webp)(\?.*)?$/i.test(item.link)) {
+    return item.link;
   }
-  if (item.content) {
-    const match = item.content.match(/<img[^>]+src=["']([^"']+)["']/i);
-    if (match) return match[1];
-  }
+
   return null;
 }
 
@@ -72,9 +92,6 @@ async function processFeed(client, guild, channel, feed, settings) {
   for (const item of feedData.items.slice(0, 5)) {
     if (!item.link) continue;
     if (await db.hasNewsPosted(guild.id, item.link)) continue;
-
-    const description = extractDescription(item);
-    const imageUrl = extractImage(item);
 
     const embed = new EmbedBuilder()
       .setColor(color)
