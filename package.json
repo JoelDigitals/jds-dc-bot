@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node src/index.js",
+    "build": "echo Build skipped",
     "deploy": "node src/deploy-commands.js",
     "deploy:guild": "node src/deploy-commands.js"
   },

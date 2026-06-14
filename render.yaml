@@ -1,11 +1,9 @@
 services:
-  # Django Web Dashboard
   - type: web
-    name: jd-dashboard
-    rootDir: web
+    name: jds-dc-bot
     runtime: python
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: gunicorn web_overlay.wsgi:application --bind 0.0.0.0:$PORT
+    buildCommand: pip install -r web/requirements.txt && cd web && python manage.py collectstatic --noinput && cd .. && npm install
+    startCommand: bash start.sh
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -32,18 +30,4 @@ services:
       - key: PGPORT
         value: "6543"
       - key: CSRF_TRUSTED_ORIGINS
-        sync: false
-
-  # Discord Bot (Node.js)
-  - type: worker
-    name: jd-bot
-    runtime: node
-    buildCommand: npm install
-    startCommand: node src/index.js
-    envVars:
-      - key: DISCORD_TOKEN
-        sync: false
-      - key: CLIENT_ID
-        sync: false
-      - key: SUPABASE_URL
         sync: false
