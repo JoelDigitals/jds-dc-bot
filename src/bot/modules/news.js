@@ -53,16 +53,16 @@ function extractImage(item) {
 }
 
 function extractDescription(item) {
-  if (item.contentSnippet) return item.contentSnippet.substring(0, 300);
-  if (item['content:encoded']) {
-    const text = item['content:encoded'].replace(/<[^>]+>/g, '').trim();
-    return text.substring(0, 300);
-  }
-  if (item.content) {
-    const text = item.content.replace(/<[^>]+>/g, '').trim();
-    return text.substring(0, 300);
-  }
-  return '';
+  let text = '';
+  if (item.contentSnippet) text = item.contentSnippet;
+  else if (item['content:encoded']) text = item['content:encoded'].replace(/<[^>]+>/g, '').trim();
+  else if (item.content) text = item.content.replace(/<[^>]+>/g, '').trim();
+  if (!text) return '';
+
+  // Strip [Bild: URL] / [Image: URL] patterns
+  text = text.replace(/\[(Bild|Image):\s*https?:\/\/[^\]]+\]/gi, '');
+
+  return text.trim().substring(0, 300);
 }
 
 function parseFeeds(settings) {
