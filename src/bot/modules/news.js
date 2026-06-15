@@ -93,6 +93,9 @@ async function processFeed(client, guild, channel, feed, settings) {
     if (!item.link) continue;
     if (await db.hasNewsPosted(guild.id, item.link)) continue;
 
+    const description = extractDescription(item);
+    const imageUrl = extractImage(item);
+
     const embed = new EmbedBuilder()
       .setColor(color)
       .setTitle(item.title || 'Neuer Blog-Artikel')
